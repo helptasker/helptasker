@@ -14,8 +14,6 @@ sub startup {
 	$self->default_config;
 	$self->helper(mysql => sub { state $mysql = Mojo::mysql->new($self->config('mysql'))});
 
-	say dumper $self->mysql->db->query('SELECT VERSION() as version;')->hashes->last->{'version'};
-
 	my $r = $self->routes;
 	$r->get('/')->to('example#welcome');
 }
@@ -43,9 +41,15 @@ sub default_config {
 	my $config = {
 	};
 
-	if(defined $ENV{'MOJO_TEST'} && $ENV{'MOJO_TEST'} == 1){
+	if(defined $ENV{'TRAVIS'}){
 		$config = $self->app->plugin('Config', {default=>$config});
 		$config->{'mysql'} = 'mysql://root@/test';
+		return $config;
+
+	}
+	elsif(defined $ENV{'MOJO_TEST'} && $ENV{'MOJO_TEST'} == 1){
+		$config = $self->app->plugin('Config', {default=>$config});
+		$config->{'mysql'} = 'mysql://test@/test';
 		return $config;
 	}
 	elsif(-f '/etc/helptasker.conf'){
