@@ -17,14 +17,11 @@ addons:
     - libexpat1-dev
     - libv8-3.14-dev
     - libgd-dev
-    - mysql-server-5.6
-    - mysql-client-core-5.6
-    - mysql-client-5.6
 addons:
   hosts:
     - helptasker.net
 env:
-  - "MOJO_TEST_TRAVIS=1"
+  - "MOJO_TEST=1"
 before_install:
   - curl -O https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/deb/elasticsearch/2.3.2/elasticsearch-2.3.2.deb && sudo dpkg -i --force-confnew elasticsearch-2.3.2.deb && sudo service elasticsearch restart
 before_script:
