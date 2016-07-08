@@ -28,7 +28,7 @@ addons:
 env:
   - "MOJO_TEST=1"
 before_install:
-  - curl -O https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/deb/elasticsearch/2.3.2/elasticsearch-2.3.2.deb && sudo dpkg -i --force-confnew elasticsearch-2.3.2.deb && sudo service elasticsearch restart
+  - curl -O https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/deb/elasticsearch/2.3.4/elasticsearch-2.3.4.deb && sudo dpkg -i --force-confnew elasticsearch-2.3.4.deb && sudo service elasticsearch restart
 before_script:
   - mysql --version
   - sudo mysql -u root -e 'create database test;'
