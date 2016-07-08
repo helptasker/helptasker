@@ -8,7 +8,6 @@ $ENV{'MOJO_TEST'} = 1;
 
 my $t = Test::Mojo->new('HelpTasker');
 ok(ref $t eq 'Test::Mojo', 'check object');
-ok($t->app->config('mysql') eq 'mysql://test@/test', 'config mysql');
 like($t->app->mysql->db->query('SELECT VERSION() as version;')->hashes->last->{'version'}, qr/^5/, 'check mysql version');
 
 done_testing();
