@@ -5,7 +5,6 @@ use Mojo::mysql;
 
 sub startup {
 	my $self = shift;
-
 	#$self->moniker('helptasker');
 	#$self->mode('development');
 
@@ -45,7 +44,6 @@ sub default_config {
 		$config = $self->app->plugin('Config', {default=>$config});
 		$config->{'mysql'} = 'mysql://root@/test';
 		return $config;
-
 	}
 	elsif(defined $ENV{'MOJO_TEST'} && $ENV{'MOJO_TEST'} == 1){
 		$config = $self->app->plugin('Config', {default=>$config});
