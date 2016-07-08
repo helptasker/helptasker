@@ -1,5 +1,4 @@
 sudo: true
-dist: trusty
 language: perl
 perl:
   - "5.22"
@@ -30,8 +29,8 @@ before_install:
   - curl -O https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/deb/elasticsearch/2.3.2/elasticsearch-2.3.2.deb && sudo dpkg -i --force-confnew elasticsearch-2.3.2.deb && sudo service elasticsearch restart
 before_script:
   - mysql --version
-  - sudo mysql -e 'create database test;'
+  - sudo mysql -u root -e 'create database test;'
 after_script:
-  - sudo mysql -e 'drop database test;'
+  - sudo mysql -u root -e 'drop database test;'
 
 # https://github.com/travis-ci/apt-package-whitelist/blob/master/ubuntu-precise
