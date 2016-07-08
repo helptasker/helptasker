@@ -5,6 +5,7 @@ perl:
   - "5.20"
   - "5.18"
 install:
+  - "cpanm -n Mojolicious DBI DBD::mysql"
   - "cpanm --installdeps --notest ."
 services:
   - memcached
