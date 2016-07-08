@@ -45,7 +45,7 @@ sub default_config {
 
 	if(defined $ENV{'MOJO_TEST'} && $ENV{'MOJO_TEST'} == 1){
 		$config = $self->app->plugin('Config', {default=>$config});
-		$config->{'mysql'} = 'mysql://test@/test';
+		$config->{'mysql'} = 'mysql://root@/test';
 		return $config;
 	}
 	elsif(-f '/etc/helptasker.conf'){
