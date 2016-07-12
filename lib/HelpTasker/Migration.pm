@@ -5,11 +5,13 @@ use Mojo::Util qw(dumper);
 sub migrate {
 	my $self = shift;
 	$self->app->mysql->migrations->from_data->migrate;
+	return;
 }
 
 sub reset {
 	my $self = shift;
 	$self->app->mysql->migrations->from_data->migrate(0)->migrate;
+	return ;
 }
 
 1;

@@ -48,9 +48,7 @@ sub default_config {
 sub helpers {
     my ($self) = @_;
 
-    $self->helper(
-        mysql => sub { state $mysql = Mojo::mysql->new($self->config('mysql')) }
-    );
+    $self->helper(mysql => sub { state $mysql = Mojo::mysql->new($self->config('mysql')) });
 
     for my $module (find_modules 'HelpTasker') {
         my $e = load_class $module;
