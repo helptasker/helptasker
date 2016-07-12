@@ -9,7 +9,7 @@ perl:
   - "5.16"
   - "5.14"
 install:
-  - "cpanm -n Mojolicious DBI DBD::mysql"
+  - "cpanm -n Mojolicious DBI DBD::mysql EV IO::Socket::Socks IO::Socket::SSL Net::DNS::Native Test::Pod Test::Pod::Coverage"
   - "cpanm --installdeps --notest ."
 services:
   - memcached
