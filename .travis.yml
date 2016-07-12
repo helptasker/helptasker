@@ -34,5 +34,11 @@ before_script:
   - sudo mysql -u root -e 'create database test;'
 after_script:
   - sudo mysql -u root -e 'drop database test;'
+notifications:
+  email:
+    on_success: always
+    on_failure: always
+    recipients:
+      - kostya@yandex.ru
 
 # https://github.com/travis-ci/apt-package-whitelist/blob/master/ubuntu-precise
