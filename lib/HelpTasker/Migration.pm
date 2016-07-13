@@ -8,10 +8,10 @@ sub migrate {
 	return;
 }
 
-sub reset {
+sub clear {
 	my $self = shift;
 	$self->app->mysql->migrations->from_data->migrate(0)->migrate;
-	return ;
+	return;
 }
 
 1;

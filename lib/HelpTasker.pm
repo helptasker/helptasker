@@ -3,6 +3,7 @@ use Mojo::Base 'Mojolicious';
 use Mojo::Util qw(dumper);
 use Mojo::Loader qw(find_modules load_class);
 use Mojo::mysql;
+use Carp;
 
 sub startup {
     my $self = shift;
@@ -52,9 +53,9 @@ sub helpers {
 
     for my $module (find_modules 'HelpTasker') {
         my $e = load_class $module;
-        warn qq{Loading "$module" failed: $e} and next if ref $e;
-        if ($module =~ m/\:\:(?<module>([a-z0-9]+))$/i) {
-            my $l = lc($+{'module'});
+        carp qq{Loading "$module" failed: $e} and next if ref $e;
+        if ($module =~ m/\:\:([a-z0-9]+)$/xi) {
+            my $l = lc($1);
             $self->helper(
                 'api.' . $l => sub {
                     my $c   = shift;

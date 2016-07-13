@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Command';
 use Mojo::Util qw(dumper);
 
 has description => 'Spy on application';
-has usage       => "Usage: APPLICATION spy [TARGET]\n";
+has usage       => "Usage: APPLICATION migration [TARGET]\n";
 
 sub run {
     my ($self, @args) = @_;
