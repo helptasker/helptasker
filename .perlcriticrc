@@ -1,7 +1,1 @@
-severity = 4
-
-[-Subroutines::ProhibitSubroutinePrototypes]
-[-Modules::RequireVersionVar]
-
-[Subroutines::ProhibitBuiltinHomonyms]
 severity = 3
