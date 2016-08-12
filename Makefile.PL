@@ -5,10 +5,13 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
 	VERSION   => '0.01',
     PREREQ_PM    => {
-		'Mojolicious' => '6.11',
-		'DBD::mysql' => '4.028',
+		'Mojolicious' => '7.01',
 		'DBI' => '1.631',
-		'Mojo::mysql' => '0.14',
+        'Mojo::Pg' => '2.29',
+        'EV' => '4.22',
+        'IO::Socket::Socks' => '0.68',
+        'IO::Socket::SSL' => '2.036',
+        'Net::DNS::Native' => '0.15',
 	},
 	test=>{TESTS => 't/*.t'}
 );
