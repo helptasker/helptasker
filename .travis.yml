@@ -9,12 +9,12 @@ perl:
   - "5.16"
   - "5.14"
 install:
-  - "cpanm -n Mojolicious DBI DBD::mysql EV IO::Socket::Socks IO::Socket::SSL Net::DNS::Native Test::Perl::Critic Test::Pod Test::Pod::Coverage"
+  - "cpanm -n Mojolicious DBI Mojo::Pg EV IO::Socket::Socks IO::Socket::SSL Net::DNS::Native Test::Perl::Critic Test::Pod Test::Pod::Coverage"
   - "cpanm --installdeps --notest ."
 services:
   - memcached
   - elasticsearch
-  - mysql
+  - postgresql
 addons:
   apt:
     packages:
@@ -25,15 +25,14 @@ addons:
 addons:
   hosts:
     - helptasker.net
+  postgresql: "9.4"
 env:
   - "MOJO_TEST=1"
 before_install:
   - curl -O https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/deb/elasticsearch/2.3.4/elasticsearch-2.3.4.deb && sudo dpkg -i --force-confnew elasticsearch-2.3.4.deb && sudo service elasticsearch restart
 before_script:
   - mysql --version
-  - sudo mysql -u root -e 'create database test;'
-after_script:
-  - sudo mysql -u root -e 'drop database test;'
+  - psql -c 'create database travis_ci_test;' -U postgres
 notifications:
   email:
     on_success: always

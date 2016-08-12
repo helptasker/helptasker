@@ -2,7 +2,7 @@ package HelpTasker;
 use Mojo::Base 'Mojolicious';
 use Mojo::Util qw(dumper);
 use Mojo::Loader qw(find_modules load_class);
-use Mojo::mysql;
+use Mojo::Pg;
 use Carp;
 
 sub startup {
@@ -23,6 +23,7 @@ sub init {
     $self->type;
     $self->default_config;
     $self->helpers;
+    $self->hooks;
     return;
 }
 
@@ -33,12 +34,12 @@ sub default_config {
 
     if (defined $ENV{'TRAVIS'}) {
         $config = $self->app->plugin('Config', {default => $config});
-        $config->{'mysql'} = 'mysql://root@localhost/test';
+        $config->{'pg'} = 'postgresql://postgres@localhost/travis_ci_test';
         return $config;
     }
     elsif (defined $ENV{'MOJO_TEST'} && $ENV{'MOJO_TEST'} == 1) {
         $config = $self->app->plugin('Config', {default => $config});
-        $config->{'mysql'} = 'mysql://test@localhost/test';
+        $config->{'pg'} = 'postgresql://test:test@localhost/test';
         return $config;
     }
     else {
@@ -49,7 +50,12 @@ sub default_config {
 sub helpers {
     my ($self) = @_;
 
-    $self->helper(mysql => sub { state $mysql = Mojo::mysql->new($self->config('mysql')) });
+    $self->helper(pg => sub { state $pg = Mojo::Pg->new($self->config('pg')) });
+    $self->pg->on(connection => sub {
+        my ($pg, $dbh) = @_;
+        #say $pg;
+    });
+
 
     for my $module (find_modules 'HelpTasker') {
         my $e = load_class $module;
@@ -67,6 +73,15 @@ sub helpers {
             );
         }
     }
+    return;
+}
+
+sub hooks {
+    my ($self) = @_;
+    $self->hook(before_routes => sub {
+        my $c = shift;
+        say $c;
+    });
     return;
 }
 

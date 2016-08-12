@@ -4,13 +4,13 @@ use Mojo::Util qw(dumper);
 
 sub migrate {
 	my $self = shift;
-	$self->app->mysql->migrations->from_data->migrate;
+	$self->app->pg->migrations->from_data->migrate;
 	return;
 }
 
 sub clear {
 	my $self = shift;
-	$self->app->mysql->migrations->from_data->migrate(0)->migrate;
+	$self->app->pg->migrations->from_data->migrate(0)->migrate;
 	return;
 }
 
@@ -19,8 +19,8 @@ sub clear {
 __DATA__
 @@ migrations
 -- 1 up
-CREATE TABLE `test` (`message_text` varchar(200)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE test (message_text varchar(200));
 
 -- 1 down
-DROP TABLE `test`;
+DROP TABLE test;
 
