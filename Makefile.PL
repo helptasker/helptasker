@@ -12,6 +12,9 @@ WriteMakefile(
         'IO::Socket::Socks' => '0.68',
         'IO::Socket::SSL' => '2.036',
         'Net::DNS::Native' => '0.15',
+        'MIME::Tools' => '5.507',
+        'MIME::Lite' => '3.030',
+        'Data::Random' => '0.12',
 	},
 	test=>{TESTS => 't/*.t'}
 );
