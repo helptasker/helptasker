@@ -20,12 +20,6 @@ has 'content_type';
 has 'body';
 has 'attachment' => sub { [] };
 
-sub to_datetime {
-    my $self = shift;
-    my $date = Mojo::Date->new($self->date)->to_datetime;
-    return $date;
-}
-
 sub mime {
     my $self = shift;
 
@@ -133,6 +127,12 @@ sub render {
 sub mimeword {
     my ($self,$string,$type) = @_;
     return encode_mimeword(encode('UTF-8', $string), $type // 'b', 'UTF-8');
+}
+
+sub to_datetime {
+    my $self = shift;
+    my $date = Mojo::Date->new($self->date)->to_datetime;
+    return $date;
 }
 
 sub parse_address {

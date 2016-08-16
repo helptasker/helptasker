@@ -1,1 +1,5 @@
 severity = 3
+
+[Subroutines::ProhibitExcessComplexity]
+max_mccabe = 30
+
