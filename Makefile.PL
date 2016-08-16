@@ -15,6 +15,7 @@ WriteMakefile(
         'MIME::Tools' => '5.507',
         'MIME::Lite' => '3.030',
         'Data::Random' => '0.12',
+        'File::Type' => '0.22',
 	},
 	test=>{TESTS => 't/*.t'}
 );
