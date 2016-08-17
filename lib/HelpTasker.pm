@@ -37,7 +37,7 @@ sub default_config {
     my $config = {
         validator_email_address=>{
             check=>{
-                mx=>1, tld=>1
+                mx=>0, tld=>1
             }
         },
     };

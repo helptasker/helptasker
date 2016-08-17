@@ -22,4 +22,19 @@ $message = $message->render;
 my $recipient = $t->app->api->email->send->recipient($message);
 ok(shift @{$recipient} eq 'devnull@yandex.ru', 'ok recipient');
 
+ok($t->app->api->email->send->from($message) eq 'pupkin@example.com', 'ok from');
+
+SKIP: {
+    skip "SMTP module, not configure", 1 if !defined $t->app->config('smtp');
+
+    $message = $t->app->api->email->message;
+    $message->from('"Testing" <kostya@yandex.com>');
+    $message->to(['devnull@yandex-team.ru']);
+    $message->body("Тест");
+    $message->content_type('plain/text; charset="UTF-8"');
+    $message = $message->render;
+    ok($t->app->api->email->send->smtp($message) eq '2.0.0', 'ok status smtp');
+};
+
+
 done_testing();
