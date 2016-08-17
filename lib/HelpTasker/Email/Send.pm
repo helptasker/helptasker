@@ -5,7 +5,7 @@ use Carp qw(croak);
 use Net::SMTP_auth;
 use MIME::Parser;
 use List::MoreUtils qw(uniq);
-use Email::Valid;
+use Mojo::JSON qw(true false);
 
 has 'from';
 
@@ -17,20 +17,28 @@ sub recipient {
     my $entity = $parser->parse_data(encode('UTF-8', $message));
     my $heads = $entity->head;
 
-    my @recipient = ();
-
+    my @tmp = ();
     for my $address (Email::Address->parse($heads->get('to'))) {
-        push(@recipient, $address->address);
+        push(@tmp, $address->address);
     }
 
     for my $address (Email::Address->parse($heads->get('cc'))) {
-        push(@recipient, $address->address);
+        push(@tmp, $address->address);
     }
-    @recipient = uniq @recipient;
 
-    croak qq/not found recipient/ unless (@recipient);
+    my @recipients = ();
+    if(my $validator_email_address = $self->app->config('validator_email_address')){
+        my $mx  = $validator_email_address->{'check'}->{'mx'};
+        my $tld = $validator_email_address->{'check'}->{'tld'};
 
-    return \@recipient;
+        for my $address (uniq @tmp){
+            push(@recipients,$address) if($self->app->api->email->utils->validator($address, {tldcheck=>$tld, mxcheck=>$mx}));
+        }
+    }
+
+    croak qq/not found recipient/ unless (@recipients);
+
+    return \@recipients;
 }
 
 1;

@@ -7,9 +7,4 @@ sub app {
     return $self->{'app'};
 }
 
-sub config {
-    my $self = shift;
-    return $self->{'app'}->{'config'};
-}
-
 1;

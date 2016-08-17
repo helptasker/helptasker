@@ -22,6 +22,7 @@ sub init {
     $self->namespaces;
     $self->type;
     $self->default_config;
+    $self->logs;
     $self->helpers;
     $self->hooks;
 
@@ -34,7 +35,11 @@ sub default_config {
     my ($self) = @_;
 
     my $config = {
-        email_valid=>{mx=>1, tld=>1},
+        validator_email_address=>{
+            check=>{
+                mx=>1, tld=>1
+            }
+        },
     };
 
     if (defined $ENV{'TRAVIS'}) {
@@ -50,6 +55,12 @@ sub default_config {
     else {
         return $self->app->plugin('Config', {default => $config});
     }
+}
+
+sub logs {
+    my ($self) = @_;
+    
+    return;
 }
 
 sub helpers {

@@ -18,6 +18,7 @@ WriteMakefile(
         'File::Type' => '0.22',
         'Net::SMTP_auth' => '0.08',
         'Email::Valid' => '1.200',
+        'Net::Domain::TLD' => '1.74',
 	},
 	test=>{TESTS => 't/*.t'}
 );
