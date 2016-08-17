@@ -59,18 +59,23 @@ like($message->render, qr{Date: Sun, 06 Nov 1994 08:49:37 GMT}, 'Date Ok');
 like($message->render, qr{Reply-To: =\?UTF-8\?B\?cmVwbHlfdG8=\?= <reply_to\@example.com>}, 'Reply-To Ok');
 like($message->render, qr{Message-Id: [a-zA-z0-9]{40}\@}, 'Message-Id Ok');
 
-note("\tMethod render (to array)");
-$message->to(["user_to1\@example.com","user_to2\@example.com"]);
-$message->cc(["user_cc1\@example.com","user_cc2\@example.com"]);
+subtest 'Array to,cc' => sub {
+    plan tests => 4;
 
-like($message->render, qr{To: =\?UTF-8\?B\?dXNlcl90bzE=\?= <user_to1\@example.com>, =\?UTF-8\?B\?dXNlcl90bzI=\?= <user_to2\@example.com>}, 'To (Array) Ok');
-like($message->render, qr{Cc: =\?UTF-8\?B\?dXNlcl9jYzE=\?= <user_cc1\@example.com>, =\?UTF-8\?B\?dXNlcl9jYzI=\?= <user_cc2\@example.com>}, 'Cc (Array) Ok');
+    $message->to(["user_to1\@example.com","user_to2\@example.com"]);
+    $message->cc(["user_cc1\@example.com","user_cc2\@example.com"]);
 
-$message->to([{name=>'user_to1', address=>'user_to1@example.com'}, {name=>'user_to2', address=>'user_to2@example.com'}]);
-$message->cc([{name=>'user_cc1', address=>'user_cc1@example.com'}, {name=>'user_cc2', address=>'user_cc2@example.com'}]);
+    like($message->render, qr{To: =\?UTF-8\?B\?dXNlcl90bzE=\?= <user_to1\@example.com>, =\?UTF-8\?B\?dXNlcl90bzI=\?= <user_to2\@example.com>}, 'To (Array) Ok');
+    like($message->render, qr{Cc: =\?UTF-8\?B\?dXNlcl9jYzE=\?= <user_cc1\@example.com>, =\?UTF-8\?B\?dXNlcl9jYzI=\?= <user_cc2\@example.com>}, 'Cc (Array) Ok');
 
-like($message->render, qr{To: =\?UTF-8\?B\?dXNlcl90bzE=\?= <user_to1\@example.com>, =\?UTF-8\?B\?dXNlcl90bzI=\?= <user_to2\@example.com>}, 'To (Array) Ok');
-like($message->render, qr{Cc: =\?UTF-8\?B\?dXNlcl9jYzE=\?= <user_cc1\@example.com>, =\?UTF-8\?B\?dXNlcl9jYzI=\?= <user_cc2\@example.com>}, 'Cc (Array) Ok');
+    $message->to([{name=>'user_to1', address=>'user_to1@example.com'}, {name=>'user_to2', address=>'user_to2@example.com'}]);
+    $message->cc([{name=>'user_cc1', address=>'user_cc1@example.com'}, {name=>'user_cc2', address=>'user_cc2@example.com'}]);
+
+    like($message->render, qr{To: =\?UTF-8\?B\?dXNlcl90bzE=\?= <user_to1\@example.com>, =\?UTF-8\?B\?dXNlcl90bzI=\?= <user_to2\@example.com>}, 'To (Array) Ok');
+    like($message->render, qr{Cc: =\?UTF-8\?B\?dXNlcl9jYzE=\?= <user_cc1\@example.com>, =\?UTF-8\?B\?dXNlcl9jYzI=\?= <user_cc2\@example.com>}, 'Cc (Array) Ok');
+};
+
+
 
 done_testing();
 
