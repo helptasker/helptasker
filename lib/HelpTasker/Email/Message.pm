@@ -1,9 +1,8 @@
 package HelpTasker::Email::Message;
 use Mojo::Base 'HelpTasker::Base';
-use Mojo::Util qw(dumper encode sha1_sum trim slurp);
+use Mojo::Util qw(dumper encode sha1_sum slurp);
 use MIME::Lite;
 use Email::Address;
-use MIME::Words qw(encode_mimeword);
 use Sys::Hostname;
 use Data::Random qw(:all);
 use File::Type;
@@ -41,10 +40,10 @@ sub mime {
 
     # From
     if (ref $self->from eq 'HASH') {
-        $msg->add(From => Email::Address->new($self->mimeword($self->from->{'name'}) => $self->from->{'address'}));
+        $msg->add(From => Email::Address->new($self->api->email->utils->mimeword($self->from->{'name'}) => $self->from->{'address'}));
     }
     else {
-        my $result = $self->parse_address($self->from);
+        my $result = $self->api->email->utils->parse_address($self->from);
         $self->from({name=>$result->{'name'}, address=>$result->{'address'}});
         $msg->add(From=>$result->{'mime'});
     }
@@ -53,10 +52,10 @@ sub mime {
     my @data = ();
     for (@{$self->to}){
         if (defined $_ && ref $_ eq 'HASH') {
-            push(@data, Email::Address->new($self->mimeword($_->{'name'}) => $_->{'address'}));
+            push(@data, Email::Address->new($self->api->email->utils->mimeword($_->{'name'}) => $_->{'address'}));
         }
         elsif(defined $_){
-            my @result = $self->parse_address($_);
+            my @result = $self->api->email->utils->parse_address($_);
             push(@data,map { $_->{'mime'} } @result);
         }
     }
@@ -66,10 +65,10 @@ sub mime {
     @data = ();
     for (@{$self->cc}){
         if (defined $_ && ref $_ eq 'HASH') {
-            push(@data, Email::Address->new($self->mimeword($_->{'name'}) => $_->{'address'}));
+            push(@data, Email::Address->new($self->api->email->utils->mimeword($_->{'name'}) => $_->{'address'}));
         }
         elsif(defined $_){
-            my @result = $self->parse_address($_);
+            my @result = $self->api->email->utils->parse_address($_);
             push(@data,map { $_->{'mime'} } @result);
         }
     }
@@ -78,10 +77,10 @@ sub mime {
     # Reply-to
     if(my $reply_to = $self->reply_to){
         if (ref $reply_to eq 'HASH') {
-            $msg->add('Reply-To' => Email::Address->new($self->mimeword($self->reply_to->{'name'}) => $self->reply_to->{'address'}));
+            $msg->add('Reply-To' => Email::Address->new($self->api->email->utils->mimeword($self->reply_to->{'name'}) => $self->reply_to->{'address'}));
         }
         else{
-            $reply_to = $self->parse_address($reply_to);
+            $reply_to = $self->api->email->utils->parse_address($reply_to);
             $msg->add('Reply-To' => $reply_to->{'mime'});
         }
     }
@@ -99,14 +98,14 @@ sub mime {
             $msg->attach(
                 Type        => $attach->{'type'},
                 Data        => $attach->{'bytes'},
-                Filename    => $self->mimeword($attach->{'filename'}),
+                Filename    => $self->api->email->utils->mimeword($attach->{'filename'}),
                 Disposition =>'attachment',
             );
         }
     }
 
     # Subject
-    $msg->add(Subject => $self->mimeword($self->subject)) if(defined $self->subject);
+    $msg->add(Subject => $self->api->email->utils->mimeword($self->subject)) if(defined $self->subject);
 
     # Replace Date
     $msg->replace("Date" => Mojo::Date->new($self->date));
@@ -124,15 +123,18 @@ sub render {
     return $self->mime->as_string;
 }
 
-sub mimeword {
-    my ($self,$string,$type) = @_;
-    return encode_mimeword(encode('UTF-8', $string), $type // 'b', 'UTF-8');
-}
-
 sub to_datetime {
     my $self = shift;
     my $date = Mojo::Date->new($self->date)->to_datetime;
     return $date;
+}
+
+1;
+
+__END__
+sub mimeword {
+    my ($self,$string,$type) = @_;
+    return encode_mimeword(encode('UTF-8', $string), $type // 'b', 'UTF-8');
 }
 
 sub parse_address {

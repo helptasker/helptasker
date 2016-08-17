@@ -13,27 +13,6 @@ ok(ref $t->app->api->email->message eq 'HelpTasker::Email::Message', 'ok object'
 
 my $message = $t->app->api->email->message;
 
-note('Method mimeword');
-ok($message->mimeword('Тест','q') eq '=?UTF-8?Q?=D0=A2=D0=B5=D1=81=D1=82?=', 'mimeword encoding QuotedPrint');
-ok($message->mimeword('Тест','b') eq '=?UTF-8?B?0KLQtdGB0YI=?=', 'mimeword encoding Base64');
-
-note('Method parse_address');
-my $address = $message->parse_address('devnull@yandex.ru');
-ok($address->{'name'} eq 'devnull', 'check address');
-ok($address->{'host'} eq 'yandex.ru', 'check host');
-ok($address->{'mime'} eq '=?UTF-8?B?ZGV2bnVsbA==?= <devnull@yandex.ru>', 'check mime standart');
-ok($address->{'address'} eq 'devnull@yandex.ru', 'check address');
-ok($address->{'original'} eq 'devnull@yandex.ru', 'check original');
-ok($address->{'user'} eq 'devnull', 'check user');
-
-my @address = $message->parse_address('devnull@yandex.ru');
-ok($address[0]->{'name'} eq 'devnull', 'check array address');
-ok($address[0]->{'host'} eq 'yandex.ru', 'check array host');
-ok($address[0]->{'mime'} eq '=?UTF-8?B?ZGV2bnVsbA==?= <devnull@yandex.ru>', 'check array mime standart');
-ok($address[0]->{'address'} eq 'devnull@yandex.ru', 'check array address');
-ok($address[0]->{'original'} eq 'devnull@yandex.ru', 'check array original');
-ok($address[0]->{'user'} eq 'devnull', 'check array user');
-
 note('Method mime');
 ok(ref $message->mime eq 'MIME::Lite', 'ok object MIME::Lite');
 
