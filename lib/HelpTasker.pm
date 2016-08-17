@@ -24,21 +24,26 @@ sub init {
     $self->default_config;
     $self->helpers;
     $self->hooks;
+
+    #say dumper $self->config;
+
     return;
 }
 
 sub default_config {
     my ($self) = @_;
 
-    my $config = {};
+    my $config = {
+        email_valid=>{mx=>1, tld=>1},
+    };
 
     if (defined $ENV{'TRAVIS'}) {
-        $config = $self->app->plugin('Config', {default => $config});
+        $config = $self->plugin('Config', {default => $config});
         $config->{'pg'} = 'postgresql://postgres@localhost/travis_ci_test';
         return $config;
     }
     elsif (defined $ENV{'MOJO_TEST'} && $ENV{'MOJO_TEST'} == 1) {
-        $config = $self->app->plugin('Config', {default => $config});
+        $config = $self->plugin('Config', {default => $config});
         $config->{'pg'} = 'postgresql://test:test@localhost/test';
         return $config;
     }
@@ -65,9 +70,8 @@ sub helpers {
             $self->helper(
                 'api.' . $l => sub {
                     my $c   = shift;
-                    my $obj = $module->new();
-                    $obj->attr(mysql => sub { $c->mysql });
-                    $obj->attr(app   => sub { $c->app });
+                    my $obj = $module->new(app=>$c->app);
+                    $obj->attr(app => sub { $c->app });
                     return $obj;
                 }
             );

@@ -16,6 +16,8 @@ WriteMakefile(
         'MIME::Lite' => '3.030',
         'Data::Random' => '0.12',
         'File::Type' => '0.22',
+        'Net::SMTP_auth' => '0.08',
+        'Email::Valid' => '1.200',
 	},
 	test=>{TESTS => 't/*.t'}
 );

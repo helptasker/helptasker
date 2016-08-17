@@ -1,5 +1,5 @@
 package HelpTasker::Email::Message;
-use Mojo::Base -base;
+use Mojo::Base 'HelpTasker::Base';
 use Mojo::Util qw(dumper encode sha1_sum trim slurp);
 use MIME::Lite;
 use Email::Address;
