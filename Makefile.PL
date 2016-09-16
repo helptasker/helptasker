@@ -21,6 +21,7 @@ WriteMakefile(
         'Net::Domain::TLD' => '1.74',
         'Text::Iconv' => '1.7',
         'Net::IP' => '1.26',
+        'HTML::Strip' => '2.10',
 	},
 	test=>{TESTS => 't/*.t'}
 );
