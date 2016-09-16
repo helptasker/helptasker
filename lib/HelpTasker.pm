@@ -35,11 +35,8 @@ sub default_config {
     my ($self) = @_;
 
     my $config = {
-        validator_email_address=>{
-            check=>{
-                mx=>0, tld=>1
-            }
-        },
+        recipient_check_mx=>1,
+        recipient_check_tld=>1,
     };
 
     if (defined $ENV{'TRAVIS'}) {

@@ -3,3 +3,9 @@ severity = 3
 [Subroutines::ProhibitExcessComplexity]
 max_mccabe = 30
 
+[RegularExpressions::ProhibitComplexRegexes]
+max_characters = 100
+
+[Subroutines::ProhibitExcessComplexity]
+max_mccabe = 40
+

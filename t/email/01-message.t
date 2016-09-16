@@ -36,7 +36,7 @@ like($message->render, qr{To: =\?UTF-8\?B\?dXNlcl90bzE=\?= <user_to1\@example.co
 like($message->render, qr{Cc: =\?UTF-8\?B\?dXNlcl9jYzE=\?= <user_cc1\@example.com>}, 'Cc Ok');
 like($message->render, qr{Date: Sun, 06 Nov 1994 08:49:37 GMT}, 'Date Ok');
 like($message->render, qr{Reply-To: =\?UTF-8\?B\?cmVwbHlfdG8=\?= <reply_to\@example.com>}, 'Reply-To Ok');
-like($message->render, qr{Message-Id: [a-zA-z0-9]{40}\@}, 'Message-Id Ok');
+like($message->render, qr{Message-Id: <[a-zA-z0-9]{40}\@}, 'Message-Id Ok');
 
 subtest 'Array to,cc' => sub {
     plan tests => 4;

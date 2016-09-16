@@ -112,7 +112,7 @@ sub mime {
 
     # Message-ID
     my $message_id = rand_chars(set => 'alphanumeric', size => 40) . '@' . hostname;
-    $msg->add('Message-ID' => $message_id);
+    $msg->add('Message-ID' => '<'.$message_id.'>');
 
     $msg->delete("X-Mailer");
     return $msg;
@@ -130,31 +130,3 @@ sub to_datetime {
 }
 
 1;
-
-__END__
-sub mimeword {
-    my ($self,$string,$type) = @_;
-    return encode_mimeword(encode('UTF-8', $string), $type // 'b', 'UTF-8');
-}
-
-sub parse_address {
-    my ($self,$string) = @_;
-
-    my @result = ();
-    for my $data (Email::Address->parse($string)) {
-        my $address  = $data->address;
-        my $name     = $data->name;
-        my $user     = $data->user;
-        my $host     = $data->host;
-        my $original = $data->original;
-
-        $address = trim(lc($address));
-        $host    = trim(lc($host));
-        my $mime = Email::Address->new($self->mimeword($name) => $address);
-        push(@result, {name => $name, address => $address, user => $user, host => $host, original => $original, mime=>$mime});
-    }
-    return wantarray ? @result : shift @result;
-}
-
-1;
-

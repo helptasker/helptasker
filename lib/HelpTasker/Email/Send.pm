@@ -25,17 +25,11 @@ sub recipient {
     }
 
     my @recipients = ();
-    if (my $validator_email_address = $self->app->config('validator_email_address')) {
-        my $mx  = $validator_email_address->{'check'}->{'mx'};
-        my $tld = $validator_email_address->{'check'}->{'tld'};
-
-        for my $address (uniq @tmp) {
-            push(@recipients, $address)
-              if (
-                $self->app->api->email->utils->validator(
-                    $address, {tldcheck => $tld, mxcheck => $mx}
-                )
-              );
+    my $config_validator = {tldcheck => $self->app->config('recipient_check_tld'), mxcheck => $self->app->config('recipient_check_mx')};
+    for my $address (uniq @tmp) {
+        my $validator = $self->app->api->email->utils->validator($address, $config_validator);
+        if(defined $validator && $validator){
+            push(@recipients, $address);
         }
     }
 
@@ -64,18 +58,15 @@ sub smtp {
     my $recipients = $self->recipient($message);
 
     my $smtp = Net::SMTP_auth->new(
-        Host    => $ENV{'HELPTASKER_SMTP_HOST'}    || $self->app->config('smtp')->{'host'},
-        Port    => $ENV{'HELPTASKER_SMTP_PORT'}    || $self->app->config('smtp')->{'port'},
-        Timeout => $ENV{'HELPTASKER_SMTP_TIMEOUT'} || $self->app->config('smtp')->{'timeout'},
-        Debug   => $ENV{'HELPTASKER_SMTP_DEBUG'}   || $self->app->config('smtp')->{'debug'},
-        SSL     => $ENV{'HELPTASKER_SMTP_SSL'}     || $self->app->config('smtp')->{'ssl'},
+        Host    => $ENV{'HELPTASKER_SMTP_HOST'}    || $self->app->config('smtp_host'),
+        Port    => $ENV{'HELPTASKER_SMTP_PORT'}    || $self->app->config('smtp_port'),
+        Timeout => $ENV{'HELPTASKER_SMTP_TIMEOUT'} || $self->app->config('smtp_timeout'),
+        Debug   => $ENV{'HELPTASKER_SMTP_DEBUG'}   || $self->app->config('smtp_debug'),
+        SSL     => $ENV{'HELPTASKER_SMTP_SSL'}     || $self->app->config('smtp_ssl'),
     ) or croak $!;
 
-    if (   defined $self->app->config('smtp')->{'login'}
-        && defined $self->app->config('smtp')->{'password'})
-    {
-        $smtp->auth($self->app->config('smtp')->{'login'},
-            $self->app->config('smtp')->{'password'});
+    if (defined $self->app->config('smtp_login') && defined $self->app->config('smtp_password')){
+        $smtp->auth($self->app->config('smtp_login'), $self->app->config('smtp_password'));
     }
 
     $smtp->mail($self->from($message)) or croak $!;
@@ -87,7 +78,16 @@ sub smtp {
         croak $error;
     }
 
-    $recipients = $smtp->recipient(@{$recipients}, $self->app->config('smtp')->{'dsn'});
+    my @dsn = ();
+    push (@dsn, 'SUCCESS') if $self->app->config('smtp_dsn_notify_success');
+    push (@dsn, 'FAILURE') if $self->app->config('smtp_dsn_notify_failure');
+    push (@dsn, 'DELAY')   if $self->app->config('smtp_dsn_notify_dalay');
+    push (@dsn, 'NEVER')   if(!@dsn);
+
+    $self->app->log->debug('SMTP DSN:'.join(", ",@dsn)) if(@dsn);
+    $self->app->log->debug('SMTP Recipients:'.join(", ",@{$recipients})) if(@dsn);
+
+    $recipients = $smtp->recipient(@{$recipients}, Notify=>\@dsn);
     if ($recipients) {
         $smtp->data();
         $smtp->datasend($_) for (unpack("(A4096)*", $message));
