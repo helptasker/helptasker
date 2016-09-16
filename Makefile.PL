@@ -20,6 +20,7 @@ WriteMakefile(
         'Email::Valid' => '1.200',
         'Net::Domain::TLD' => '1.74',
         'Text::Iconv' => '1.7',
+        'Net::IP' => '1.26',
 	},
 	test=>{TESTS => 't/*.t'}
 );
