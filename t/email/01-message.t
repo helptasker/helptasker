@@ -9,7 +9,7 @@ $ENV{'MOJO_TEST'} = 1;
 my $t = Test::Mojo->new('HelpTasker');
 $t->app->api->migration->clear;    # reset db
 
-ok(ref $t->app->api->email->message eq 'HelpTasker::Email::Message', 'ok object');
+ok(ref $t->app->api->email->message eq 'HelpTasker::API::Email::Message', 'ok object');
 
 my $message = $t->app->api->email->message;
 

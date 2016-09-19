@@ -1,5 +1,5 @@
-package HelpTasker::Ticket;
-use Mojo::Base 'Mojolicious';
+package HelpTasker::API::Ticket;
+use Mojo::Base 'HelpTasker::API::Base';
 use Mojo::Util qw(dumper);
 
 sub get {

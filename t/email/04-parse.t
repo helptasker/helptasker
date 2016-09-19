@@ -9,7 +9,7 @@ $ENV{'MOJO_TEST'} = 1;
 my $t = Test::Mojo->new('HelpTasker');
 $t->app->api->migration->clear;    # reset db
 
-ok(ref $t->app->api->email->parse eq 'HelpTasker::Email::Parse', 'ok object');
+ok(ref $t->app->api->email->parse eq 'HelpTasker::API::Email::Parse', 'ok object');
 
 $t->app->api->email->parse->parse(slurp "$FindBin::Bin/email/03.msg");
 

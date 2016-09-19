@@ -9,7 +9,7 @@ $ENV{'MOJO_TEST'} = 1;
 my $t = Test::Mojo->new('HelpTasker');
 $t->app->api->migration->clear;    # reset db
 
-ok(ref $t->app->api->email->utils eq 'HelpTasker::Email::Utils', 'ok object');
+ok(ref $t->app->api->email->utils eq 'HelpTasker::API::Email::Utils', 'ok object');
 
 ok($t->app->api->email->utils->validator('devnull@abc.def', {mxcheck=>1}) == 0, 'invalid email (mxcheck)');
 ok($t->app->api->email->utils->validator('devnull@abc.def', {tldcheck=>1}) == 0, 'invalid email (tldcheck)');

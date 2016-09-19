@@ -4,13 +4,13 @@ use Mojo::Util qw(dumper);
 use Mojo::Loader qw(find_modules load_class);
 use Mojo::Pg;
 use Carp;
+use Try::Tiny;
+use Time::HiRes();
 
 sub startup {
     my $self = shift;
     $self->init;
 
-    my $r = $self->routes;
-    $r->get('/')->to('example#welcome');
     return;
 }
 
@@ -25,10 +25,20 @@ sub init {
     $self->logs;
     $self->helpers;
     $self->hooks;
-
+    $self->route;
+    $self->validation;
     #say dumper $self->config;
 
     return;
+}
+
+sub route {
+    my ($self) = @_;
+    my $r = $self->routes;
+    #$r->get('/')->to('example#welcome');
+    $r->any('/api/:version/:action/'=>[version => ['v1'], method=>qr/[a-z]{1}[0-9a-z]+/ix])->to(controller => 'API');
+    $r->any('/api/:version/:action/:param'=>[version => ['v1'], method=>qr/[a-z]{1}[0-9a-z]+/ix, param=>qr/[a-z0-9\;]/x])->to(controller => 'API');
+    return $r;
 }
 
 sub default_config {
@@ -37,6 +47,7 @@ sub default_config {
     my $config = {
         recipient_check_mx=>1,
         recipient_check_tld=>1,
+        api_prefix_http_header=>"X-HelpTasker",
     };
 
     if (defined $ENV{'TRAVIS'}) {
@@ -64,13 +75,8 @@ sub helpers {
     my ($self) = @_;
 
     $self->helper(pg => sub { state $pg = Mojo::Pg->new($self->config('pg')) });
-    $self->pg->on(connection => sub {
-        my ($pg, $dbh) = @_;
-        #say $pg;
-    });
 
-
-    for my $module (find_modules 'HelpTasker') {
+    for my $module (find_modules 'HelpTasker::API') {
         my $e = load_class $module;
         carp qq{Loading "$module" failed: $e} and next if ref $e;
         if ($module =~ m/\:\:([a-z0-9]+)$/xi) {
@@ -79,12 +85,33 @@ sub helpers {
                 'api.' . $l => sub {
                     my $c   = shift;
                     my $obj = $module->new(app=>$c->app);
-                    $obj->attr(app => sub { $c->app });
                     return $obj;
                 }
             );
         }
     }
+
+    $self->helper('reply.api' => sub {
+        my ($c, $json, $param) = @_;
+        $param->{'status'} ||= 200;
+
+        if(my $started = $c->stash('mojo.started')){
+            my $elapsed = Time::HiRes::tv_interval($started, [Time::HiRes::gettimeofday()]);
+            my $rps  = $elapsed == 0 ? '??' : sprintf '%.3f', 1 / $elapsed;
+            $c->res->headers->header($c->config('api_prefix_http_header').'-Performance' => "${elapsed}s, $rps/s");
+        }
+
+        #$c->res->headers->header('X-HelpTasker-Warnings' => undef);
+        $c->res->headers->header($c->config('api_prefix_http_header').'-Version' => $c->stash('version'));
+
+        if($param->{'status'} >= 400){
+            return $c->render(json => {error=>$json, status=>$param->{'status'}}, status=>$param->{'status'});
+        }
+        else{
+            return $c->render(json => {response=>$json, status=>$param->{'status'}}, status=>$param->{'status'});
+        }
+    });
+
     return;
 }
 
@@ -92,8 +119,49 @@ sub hooks {
     my ($self) = @_;
     $self->hook(before_routes => sub {
         my $c = shift;
-        say $c;
+
+        my $ip = $c->req->headers->header('X-Real-IP') || $c->req->headers->header('X-Forwarded-For') || $c->tx->remote_address;
+        $self->app->log->info('Remote Address ' . $ip);
+
+
+        #if($c->req->url->to_string =~ m/^\/api\//ix){
+        #    if(my $timezone = $c->req->headers->header('x-helptasker-timezone')){
+        #        $c->pg->on(connection => sub {
+        #            my ($pg, $dbh) = @_;
+        #            $dbh->do("SET datestyle TO postgres, dmy;");
+        #            $dbh->do("set timezone = '$timezone'");
+        #        });
+        #    }
+        #}
     });
+
+    $self->hook(around_action => sub {
+        my ($next, $c, $action, $latest) = @_;
+
+        if($c->stash('controller') eq 'API'){
+            try {
+                $next->();
+            }
+            catch {
+                my $error = $_;
+                if($error =~ m/^invalid\sparam/x){
+                    if($error =~ /^([a-z0-9\s,:\[\]]+),\spackage/xi){
+                        $c->reply->api($1, {status=>400});
+                    }
+                    else{
+                        $c->reply->api($error, {status=>500});
+                    }
+                }
+                else {
+                    $c->reply->api($error, {status=>500});
+                }
+            };
+        }
+        else{
+            return $next->();
+        }
+    });
+
     return;
 }
 
@@ -110,6 +178,23 @@ sub type {
     $self->app->types->type(html => 'text/html; charset=utf-8');
     $self->app->types->type(xml  => 'text/xml; charset=utf-8');
     $self->app->types->type(json => 'application/json; charset=utf-8');
+    return;
+}
+
+sub validation {
+    my ($self) = @_;
+
+    # Проверки сущестрования индификаторов
+    $self->app->validator->add_check(
+        id => sub {
+            my ($c, $field, $value, @args) = @_;
+            if(defined $field && $field eq 'project_id' && defined $value && $value){
+                my $pg = $self->app->pg->db->query("SELECT project_id FROM projects WHERE project_id = ? LIMIT 1",$value);
+                my $rows = $pg->rows;
+                return defined $rows && $rows ? undef : 1;
+            }
+        }
+    );
     return;
 }
 

@@ -1,5 +1,5 @@
-package HelpTasker::Email::Parse;
-use Mojo::Base 'HelpTasker::Base';
+package HelpTasker::API::Email::Parse;
+use Mojo::Base 'HelpTasker::API::Base';
 use Mojo::Util qw(dumper sha1_sum trim);
 use MIME::Parser;
 use MIME::WordDecoder;

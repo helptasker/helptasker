@@ -1,5 +1,5 @@
-package HelpTasker::Email::Send;
-use Mojo::Base 'HelpTasker::Base';
+package HelpTasker::API::Email::Send;
+use Mojo::Base 'HelpTasker::API::Base';
 use Mojo::Util qw(dumper encode decode);
 use Carp qw(croak);
 use Net::SMTP_auth;

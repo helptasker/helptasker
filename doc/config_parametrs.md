@@ -4,3 +4,4 @@
 ------------ | ------------- | -------------
 recipient_check_mx | 1 or 0 | При отправке проверять MX записи
 recipient_check_tld | 1 or 0 | При отправке проверять TLD домен
+api_prefix_http_header |  X-HelpTasker | Префикс HTTP заголовков ответа API

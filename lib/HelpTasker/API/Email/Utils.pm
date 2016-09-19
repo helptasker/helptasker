@@ -1,5 +1,5 @@
-package HelpTasker::Email::Utils;
-use Mojo::Base 'HelpTasker::Base';
+package HelpTasker::API::Email::Utils;
+use Mojo::Base 'HelpTasker::API::Base';
 use Mojo::Util qw(dumper trim encode);
 use Carp qw(croak);
 use Email::Valid;
