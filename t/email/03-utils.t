@@ -12,7 +12,7 @@ $t->app->api->migration->clear;    # reset db
 ok(ref $t->app->api->email->utils eq 'HelpTasker::API::Email::Utils', 'ok object');
 
 SKIP: {
-    skip "skipped surrounded travis", 5 if defined $ENV{'TRAVIS'} && $ENV{'TRAVIS'} == 1;
+    skip "skipped surrounded travis", 5 if defined $ENV{'TRAVIS'} && $ENV{'TRAVIS'} eq 'true';
     
     ok($t->app->api->email->utils->validator('devnull@abc.def', {mxcheck=>1}) == 0, 'invalid email (mxcheck)');
     ok($t->app->api->email->utils->validator('devnull@abc.def', {tldcheck=>1}) == 0, 'invalid email (tldcheck)');
