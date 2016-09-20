@@ -11,13 +11,15 @@ $t->app->api->migration->clear;    # reset db
 
 ok(ref $t->app->api->email->utils eq 'HelpTasker::API::Email::Utils', 'ok object');
 
-ok($t->app->api->email->utils->validator('devnull@abc.def', {mxcheck=>1}) == 0, 'invalid email (mxcheck)');
-ok($t->app->api->email->utils->validator('devnull@abc.def', {tldcheck=>1}) == 0, 'invalid email (tldcheck)');
-
-ok($t->app->api->email->utils->validator('devnull@example.com', {tldcheck=>1}) == 1, 'valid email (tldcheck)');
-ok($t->app->api->email->utils->validator('devnull@example.com', {tldcheck=>1, mxcheck=>1}) == 0, 'invalid email (mxcheck)');
-ok($t->app->api->email->utils->validator('devnull@yandex.ru', {tldcheck=>1, mxcheck=>1}) == 1, 'valid email (tldcheck and mxcheck)');
-
+SKIP: {
+    skip "skipped surrounded travis", 5 if defined $ENV{'TRAVIS'} && $ENV{'TRAVIS'} == 1;
+    
+    ok($t->app->api->email->utils->validator('devnull@abc.def', {mxcheck=>1}) == 0, 'invalid email (mxcheck)');
+    ok($t->app->api->email->utils->validator('devnull@abc.def', {tldcheck=>1}) == 0, 'invalid email (tldcheck)');
+    ok($t->app->api->email->utils->validator('devnull@example.com', {tldcheck=>1}) == 1, 'valid email (tldcheck)');
+    ok($t->app->api->email->utils->validator('devnull@example.com', {tldcheck=>1, mxcheck=>1}) == 0, 'invalid email (mxcheck)');
+    ok($t->app->api->email->utils->validator('devnull@yandex.ru', {tldcheck=>1, mxcheck=>1}) == 1, 'valid email (tldcheck and mxcheck)');
+};
 
 note('Method parse_address');
 my $address = $t->app->api->email->utils->parse_address('devnull@yandex.ru');
