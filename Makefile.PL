@@ -5,9 +5,9 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
 	VERSION   => '0.01',
     PREREQ_PM    => {
-		'Mojolicious' => '7.01',
+		'Mojolicious' => '7.06',
 		'DBI' => '1.631',
-        'Mojo::Pg' => '2.29',
+        'Mojo::Pg' => '2.30',
         'EV' => '4.22',
         'IO::Socket::Socks' => '0.68',
         'IO::Socket::SSL' => '2.036',
