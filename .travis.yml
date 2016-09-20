@@ -10,7 +10,7 @@ perl:
   - "5.14"
 install:
   - "cpanm -n Mojolicious DBI Mojo::Pg EV IO::Socket::Socks IO::Socket::SSL Net::DNS::Native Test::Perl::Critic Test::Pod Test::Pod::Coverage"
-  - "cpanm --installdeps --notest ."
+  - "cpanm --quiet --installdeps --notest ."
 services:
   - memcached
   - elasticsearch
