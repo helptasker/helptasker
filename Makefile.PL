@@ -23,7 +23,8 @@ WriteMakefile(
         'Net::IP' => '1.26',
         'HTML::Strip' => '2.10',
 	},
-	test=>{TESTS => 't/*.t'}
+    EXE_FILES => ['script/helptasker'],
+	test=>{TESTS => 't/*.t t/*/*.t'}
 );
 
 
