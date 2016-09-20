@@ -86,7 +86,7 @@ sub update {
     my $validation = $self->validation->input(\%param);
     $validation->required('project_id','trim')->id;
     $validation->required('name');
-    $validation->required('fqdn','trim');
+    $validation->required('fqdn','trim')->like(qr/^[a-z]{1}[a-z0-9_]+$/x);
     $self->app->api->utils->error_validation($validation);
 
     my @id = ();
@@ -96,8 +96,8 @@ sub update {
     }
 
     $self->app->pg->db->query('UPDATE projects SET name = ?, fqdn = ? WHERE project_id = ?',@id);
-    $self->get;
-    return $self;
+    $self->flush(project_id=>$validation->param('project_id'));
+    return $self->get;
 }
 
 # Print hash

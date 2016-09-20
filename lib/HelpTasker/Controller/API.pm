@@ -25,6 +25,15 @@ sub project {
         $self->app->api->project->delete(%{$self->validation->output});
         return $self->reply->api({});
     }
+    elsif($self->req->method eq 'PUT'){
+        my $validation = $self->validation->input($self->req->json);
+        $validation->required('project_id','trim')->like(qr/^[0-9]+$/x)->id;
+        $validation->required('name');
+        $validation->required('fqdn');
+        $self->app->api->utils->error_validation($validation);
+        my $project = $self->app->api->project->update(%{$validation->output});
+        return $self->reply->api($project);
+    }
     elsif($self->req->method eq 'GET'){
         $self->validation->required('project_id','trim')->like(qr/^[0-9]+$/x)->id;
         $self->app->api->utils->error_validation($self->validation);

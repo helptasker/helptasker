@@ -58,9 +58,6 @@ subtest 'method update' => sub {
     ok(ref $project eq 'HelpTasker::API::Project', 'ok object');
 
     $project = $t->app->api->project->update(project_id=>$project->project_id, name=>'test project2', fqdn=>'test_project2');
-    ok(ref $project eq 'HelpTasker::API::Project', 'ok object');
-
-    $project = $project->get;
 
     ok($project->{'project_id'} == 1, 'project_id');
     ok($project->{'name'} eq 'test project2', 'name');
@@ -117,17 +114,16 @@ subtest 'HTTP API' => sub {
         ->json_like('/response/date_update' => qr/^[0-9]{4}-[0-9]{2}-[0-9]{2}\s[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]+\+[0-9]+$/x)
         ->json_like('/response/project_id' => qr/^[0-9]+$/x)
     ;
+
+    $t->put_ok('/api/v1/project/'=>json=>{name=>'test project2', fqdn=>'test_project2', project_id=>$project_id})
+        ->status_is(200)
+        ->json_is('/status' => 200)
+        ->json_is('/response/fqdn' => 'test_project2')
+        ->json_is('/response/name' => 'test project2')
+        ->json_like('/response/date_create' => qr/^[0-9]{4}-[0-9]{2}-[0-9]{2}\s[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]+\+[0-9]+$/x)
+        ->json_like('/response/date_update' => qr/^[0-9]{4}-[0-9]{2}-[0-9]{2}\s[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]+\+[0-9]+$/x)
+        ->json_like('/response/project_id' => qr/^[0-9]+$/x)
+    ;
 };
-
-#say dumper $t->tx->res->json;
-
-
-
-
-#$t->app->api->project->update(project_id=>1, name=>'test project2', fqdn=>'test_project2');
-
-#$project = $t->app->api->project->get(project_id=>1);
-#say dumper $project;
-
 
 done_testing();
