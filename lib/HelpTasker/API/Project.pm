@@ -14,10 +14,16 @@ sub create {
 
     my $validation = $self->validation->input(\%param);
     $validation->required('name');
-    $validation->required('fqdn','trim');
+    $validation->required('fqdn','trim')->like(qr/^[a-z]{1}[a-z0-9_]+$/x);
     $self->app->api->utils->error_validation($validation);
 
-    my $pg = $self->app->pg->db->query('INSERT INTO projects (name,fqdn) VALUES(?,?) RETURNING project_id',$validation->param('name'),$validation->param('fqdn'));
+    my @id = ();
+    for my $item (qw/name fqdn/){
+        push(@id, $validation->param($item));
+        $self->$item($validation->param($item));
+    }
+
+    my $pg = $self->app->pg->db->query('INSERT INTO projects (name,fqdn) VALUES(?,?) RETURNING project_id',@id);
     $self->project_id($pg->hash->{'project_id'});
     $self->get;
     return $self;
@@ -51,7 +57,7 @@ sub remove {
     $self->app->api->utils->error_validation($validation);
 
     $self->project_id($validation->param('project_id'));
-    $self->app->pg->db->query("DELETE FROM projects WHERE project_id = ? LIMIT 1",$validation->param('project_id'));
+    $self->app->pg->db->query("DELETE FROM projects WHERE project_id = ?",$validation->param('project_id'));
     return $self;
 }
 
@@ -62,10 +68,34 @@ sub flush {
 
     my $validation = $self->validation->input(\%param);
     $validation->required('project_id','trim')->id;
+
     $self->app->api->utils->error_validation($validation);
 
     $self->project_id($validation->param('project_id'));
     $self->app->pg->db->query("UPDATE projects SET date_update = current_timestamp WHERE project_id = ?",$validation->param('project_id'));
+    $self->get;
+    return $self;
+}
+
+sub update {
+    my ($self,%param) = @_;
+    $param{'project_id'} ||= $self->project_id;
+    $param{'name'}       ||= $self->name;
+    $param{'fqdn'}       ||= $self->fqdn;
+
+    my $validation = $self->validation->input(\%param);
+    $validation->required('project_id','trim')->id;
+    $validation->required('name');
+    $validation->required('fqdn','trim');
+    $self->app->api->utils->error_validation($validation);
+
+    my @id = ();
+    for my $item (qw/name fqdn project_id/){
+        push(@id, $validation->param($item));
+        $self->$item($validation->param($item));
+    }
+
+    $self->app->pg->db->query('UPDATE projects SET name = ?, fqdn = ? WHERE project_id = ?',@id);
     $self->get;
     return $self;
 }
