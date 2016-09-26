@@ -38,6 +38,9 @@ sub route {
     #$r->get('/')->to('example#welcome');
     $r->any('/api/:version/:action/'=>[version => ['v1'], method=>qr/[a-z]{1}[0-9a-z]+/ix])->to(controller => 'API');
     $r->any('/api/:version/:action/:param'=>[version => ['v1'], method=>qr/[a-z]{1}[0-9a-z]+/ix, param=>qr/[a-z0-9\;]/x])->to(controller => 'API');
+    $r->get('/doc/')->to(controller => 'doc', action=>'index');
+    $r->get('/doc/:module')->to(controller => 'doc', action=>'index');
+
     return $r;
 }
 
@@ -200,4 +203,22 @@ sub validation {
 }
 
 1;
+
+=encoding utf8
+ 
+=head1 NAME
+ 
+L<HelpTasker> - A powerful tool for creating technical support, and for the accounting system bugs
+
+=head1 Modules
+ 
+L<HelpTasker::API::Session> - A powerful tool for creating technical support, and for the accounting system bugs
+ 
+
+=head1 SEE ALSO
+ 
+L<http://helptasker.org>.
+
+
+=cut
 

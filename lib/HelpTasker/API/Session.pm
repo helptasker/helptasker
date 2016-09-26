@@ -5,8 +5,6 @@ use Carp qw(croak);
 use Net::IP;
 use Data::Random qw(rand_chars);
 use Mojo::JSON qw(true false);
-
-
 use overload bool => sub {1}, fallback => 1;
 
 has [qw(session_id name ip key data expiry session_id session_key)];
@@ -90,3 +88,67 @@ sub get_key {
 }
 
 1;
+
+
+=encoding utf8
+ 
+=head1 NAME
+ 
+HelpTasker::API::Session - The module works with sessions
+ 
+=head1 SYNOPSIS
+ 
+  # Automatically enables "strict", "warnings", "utf8" and Perl 5.10 features
+  use Mojolicious::Lite;
+ 
+  # Route with placeholder
+  get '/:foo' => sub {
+    my $c   = shift;
+    my $foo = $c->param('foo');
+    $c->render(text => "Hello from $foo.");
+  };
+ 
+  # Start the Mojolicious command system
+  app->start;
+ 
+=head1 DESCRIPTION
+ 
+L<Mojolicious::Lite> is a micro real-time web framework built around
+L<Mojolicious>.
+ 
+See L<Mojolicious::Guides::Tutorial> for more!
+ 
+=head1 FUNCTIONS
+ 
+L<Mojolicious::Lite> implements the following functions, which are
+automatically exported.
+ 
+=head2 any
+ 
+  my $route = any '/:foo' => sub {...};
+  my $route = any '/:foo' => sub {...} => 'name';
+  my $route = any '/:foo' => {foo => 'bar'} => sub {...};
+  my $route = any '/:foo' => [foo => qr/\w+/] => sub {...};
+  my $route = any ['GET', 'POST'] => '/:foo' => sub {...};
+  my $route = any ['GET', 'POST'] => '/:foo' => [foo => qr/\w+/] => sub {...};
+  my $route = any
+    ['GET', 'POST'] => '/:foo' => (agent => qr/Firefox/) => sub {...};
+ 
+Generate route with L<Mojolicious::Routes::Route/"any">, matching any of the
+listed HTTP request methods or all. See L<Mojolicious::Guides::Tutorial> and
+L<Mojolicious::Guides::Routing> for more information.
+ 
+=head1 ATTRIBUTES
+ 
+L<Mojolicious::Lite> inherits all attributes from L<Mojolicious>.
+ 
+=head1 METHODS
+ 
+L<Mojolicious::Lite> inherits all methods from L<Mojolicious>.
+ 
+=head1 SEE ALSO
+ 
+L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
+ 
+=cut
+
