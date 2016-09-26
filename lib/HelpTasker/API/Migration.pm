@@ -28,8 +28,20 @@ CREATE TABLE projects (
     fqdn        TEXT      UNIQUE NOT NULL
 );
 
+CREATE TABLE session (
+    session_id   SERIAL    PRIMARY KEY,
+    key          TEXT      UNIQUE NOT NULL,
+    name         TEXT      NOT NULL,
+    date_create  TIMESTAMP with time zone NOT NULL DEFAULT current_timestamp,
+    date_update  TIMESTAMP with time zone NOT NULL DEFAULT current_timestamp,
+    date_expiry  TIMESTAMP with time zone NOT NULL DEFAULT current_timestamp,
+    ip           INET      NULL DEFAULT NULL,
+    data         JSON      NOT NULL
+);
+
 -- 1 down
 DROP TABLE IF EXISTS test;
 DROP TABLE IF EXISTS projects;
+DROP TABLE IF EXISTS session;
 
 

@@ -48,6 +48,7 @@ sub default_config {
         recipient_check_mx=>1,
         recipient_check_tld=>1,
         api_prefix_http_header=>"X-HelpTasker",
+        session_expiry=>300,
     };
 
     if (defined $ENV{'TRAVIS'}) {

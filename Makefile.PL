@@ -22,6 +22,7 @@ WriteMakefile(
         'Text::Iconv' => '1.7',
         'Net::IP' => '1.26',
         'HTML::Strip' => '2.10',
+        'Data::Random' => '0.12',
 	},
     EXE_FILES => ['script/helptasker'],
 	test=>{TESTS => 't/*.t t/*/*.t'}
