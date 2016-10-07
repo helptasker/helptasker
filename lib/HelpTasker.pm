@@ -71,7 +71,6 @@ sub default_config {
 
 sub logs {
     my ($self) = @_;
-    
     return;
 }
 
@@ -79,6 +78,7 @@ sub helpers {
     my ($self) = @_;
 
     $self->helper(pg => sub { state $pg = Mojo::Pg->new($self->config('pg')) });
+    $self->plugin('ACME');
 
     for my $module (find_modules 'HelpTasker::API') {
         my $e = load_class $module;
@@ -212,9 +212,8 @@ L<HelpTasker> - A powerful tool for creating technical support, and for the acco
 
 =head1 Modules
  
-L<HelpTasker::API::Session> - A powerful tool for creating technical support, and for the accounting system bugs
+L<HelpTasker::API::Session> - Тест A powerful tool for creating technical support, and for the accounting system bugs
  
-
 =head1 SEE ALSO
  
 L<http://helptasker.org>.

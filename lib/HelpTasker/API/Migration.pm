@@ -34,7 +34,8 @@ CREATE TABLE session (
     name         TEXT      NOT NULL,
     date_create  TIMESTAMP with time zone NOT NULL DEFAULT current_timestamp,
     date_update  TIMESTAMP with time zone NOT NULL DEFAULT current_timestamp,
-    date_expiry  TIMESTAMP with time zone NOT NULL DEFAULT current_timestamp,
+    date_expire  TIMESTAMP with time zone NOT NULL DEFAULT current_timestamp,
+    expire       INTEGER   NOT NULL,
     ip           INET      NULL DEFAULT NULL,
     data         JSON      NOT NULL
 );

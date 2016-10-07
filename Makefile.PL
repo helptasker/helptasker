@@ -23,6 +23,7 @@ WriteMakefile(
         'Net::IP' => '1.26',
         'HTML::Strip' => '2.10',
         'Data::Random' => '0.12',
+        'Mojo::ACME' => '0.07',
 	},
     EXE_FILES => ['script/helptasker'],
 	test=>{TESTS => 't/*.t t/*/*.t'}

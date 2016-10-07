@@ -7,6 +7,15 @@ sub app {
     return $self->{'app'};
 }
 
+sub pg {
+    my $self = shift;
+    return $self->app->pg;
+}
+
+sub log {
+    my $self = shift;
+    return $self->app->log;
+}
 
 sub api {
     my $self = shift;
