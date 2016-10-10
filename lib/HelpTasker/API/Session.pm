@@ -173,12 +173,9 @@ Available after calling methods create or get
     my $str = "$session";
 
 
-=head1 DESCRIPTION
- 
-L<Mojolicious::Lite> is a micro real-time web framework built around
-L<Mojolicious>.
- 
-See L<Mojolicious::Guides::Tutorial> for more!
+=head1 SEE ALSO
+
+L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
  
 =cut
 

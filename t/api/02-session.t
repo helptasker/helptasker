@@ -36,7 +36,8 @@ subtest 'method get' => sub {
         en_str=>'Test',
         int=>12345,
         unicode=>"\x{20AC}",
-        ip=>'2001:cdba:0000:0000:0000:0000:3257:9652'
+        ip=>'2001:cdba:0000:0000:0000:0000:3257:9652',
+        hash=>{test=>1}
     };
 
     my $session = $t->app->api->session->create('test_project', $types);
@@ -49,7 +50,7 @@ subtest 'method get' => sub {
     ok($get->{'data'}->{'ru_str'} eq 'Тест', 'check type ru_str');
     ok($get->{'data'}->{'int'} == 12345, 'check type int');
     ok($get->{'data'}->{'unicode'} eq "\x{20AC}", 'check type unicode');
-
+    ok($get->{'data'}->{'hash'}->{'test'} == 1, 'check type hash');
 
     like($get->{'expire'}, qr/[0-9]+/ix, 'check expire');
     ok($get->{'ip'} eq "2001:cdba::3257:9652", 'check ip');
@@ -63,6 +64,14 @@ subtest 'method get' => sub {
 
     $get = $t->app->api->session->get($session);
     ok(!defined $get == 1, 'check invalid get');
+};
+
+subtest 'if' => sub {
+    $t->app->api->migration->clear; # reset db
+
+    unless(my $session = $t->app->api->session->get('1-'.'a' x 40)){
+        ok(1==1, 'invalif if');
+    }
 };
 
 
