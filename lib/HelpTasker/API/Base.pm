@@ -12,11 +12,6 @@ sub pg {
     return $self->app->pg;
 }
 
-sub log {
-    my $self = shift;
-    return $self->app->log;
-}
-
 sub api {
     my $self = shift;
     return $self->app->api;

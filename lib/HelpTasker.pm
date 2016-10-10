@@ -38,8 +38,8 @@ sub route {
     #$r->get('/')->to('example#welcome');
     $r->any('/api/:version/:action/'=>[version => ['v1'], method=>qr/[a-z]{1}[0-9a-z]+/ix])->to(controller => 'API');
     $r->any('/api/:version/:action/:param'=>[version => ['v1'], method=>qr/[a-z]{1}[0-9a-z]+/ix, param=>qr/[a-z0-9\;]/x])->to(controller => 'API');
-    $r->get('/doc/')->to(controller => 'doc', action=>'index');
-    $r->get('/doc/:module')->to(controller => 'doc', action=>'index');
+    $r->get('/doc/')->to(controller => 'Doc', action=>'main');
+    $r->get('/doc/:module')->to(controller => 'Doc', action=>'main');
 
     return $r;
 }

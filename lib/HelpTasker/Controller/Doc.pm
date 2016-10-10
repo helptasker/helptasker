@@ -5,25 +5,24 @@ use Pod::Simple::Search;
 use Mojo::Util qw(dumper);
 use Mojo::Loader qw(data_section);
 
-sub index {
+sub main {
     my $self = shift;
-    my $module = $self->stash('module') || 'HelpTasker';
     my $search = Pod::Simple::Search->new;
 
     my $result = {};
-	my ($modules) = $search->limit_glob('HelpTasker*')->survey;
-    while( my ($module) = each(%{$modules})){
-        push(@{$result->{'helptasker'}->{'modules'}}, $module);
+	my ($m) = $search->limit_glob('HelpTasker*')->survey;
+    while( my ($item) = each(%{$m})){
+        push(@{$result->{'helptasker'}->{'modules'}}, $item);
     }
     
     my @modules = sort {$a cmp $b} @{$result->{'helptasker'}->{'modules'}};
     $result->{'helptasker'}->{'modules'} = \@modules;
 
     # Search module path
-    my $path = $search->find($module);
+    my $path = $search->find($self->stash('module') || 'HelpTasker');
 
     if(!defined $path){
-        my $url = Mojo::URL->new('https://api.metacpan.org')->path("/v0/pod/$module");
+        my $url = Mojo::URL->new('https://api.metacpan.org')->path("/v0/pod/".$self->stash('module') || 'HelpTasker');
         my $tx = $self->ua->get($url);
         $result->{'documentation'} = Mojo::DOM->new($tx->res->body);
     }
@@ -42,7 +41,7 @@ sub index {
     my $mt = Mojo::Template->new;
     for my $e ($result->{'documentation'}->find('pre > code')->each) {
         my $str = $e->content;
-        $e->parent->replace("<pre pre class=\"prettyprint lang-perl padding\">$str</pre>");
+        $e->parent->replace("<pre pre class=\"prettyprint lang-perl padding\" style=\"padding:15px;\">$str</pre>");
     }
 
     $template = $mt->vars(1)->render($template, {result=>$result});
@@ -125,14 +124,12 @@ __DATA__
             }
 
             h1 {
-                font-size: 26px;
+                font-size: 22px;
             }
 
             h2 {
-                font-size: 23px;
+                font-size: 20px;
             }
-
-
         </style>
 
     </head>

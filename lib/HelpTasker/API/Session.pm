@@ -7,8 +7,7 @@ use Data::Random qw(rand_chars);
 use Mojo::JSON qw(true false);
 use overload bool => sub {1}, '""' => sub {shift->session_key }, fallback => 1;
 
-has [qw(session_id name ip key data expire session_id session_key)];
-has [qw(_result)];
+has [qw(session_id session_key _result)];
 
 # Create session
 sub create {
@@ -60,11 +59,12 @@ sub get {
        $pg = $self->pg->db->query("SELECT $fields FROM session WHERE session_id = ?",$id);
     }
     return $self if(!defined $pg);
-    return undef if($pg->rows == 0);
+    return if($pg->rows == 0);
 
     my $result = $pg->expand->hash;
     $result->{'is_valid'} = $result->{'age'} > 0 ? true : false;
 
+    $self->session_id($result->{'session_id'});
     $self->session_key($result->{'session_id'}."-".$result->{'key'});
     $self->_result($result);
     return $self;
@@ -119,9 +119,22 @@ HelpTasker::API::Session - The module works with sessions
     # Delete session
     $self->app->api->session->remove($session);
 
+=head1 ATTRIBUTES
+
+Available after calling methods create or get
+
+=head2 session_key - Returns the session key
+
+    $session->session_key;
+
+=head2 session_id - Returns the identifier
+
+    $session->session_id;
+
+
 =head1 METHODS
 
-=head2 create
+=head2 create - Creates a session
 
     my $params = {
         ip=>'127.0.0.1', # IP address parameter optional
@@ -129,13 +142,15 @@ HelpTasker::API::Session - The module works with sessions
         foo=>'bar'       # hash
     };
 
-    my $session = $self->app->api->session->create('name_session',$params); # Return object HelpTasker::API::Session
+    # Return object HelpTasker::API::Session
+    my $session = $self->app->api->session->create('name_session',$params);
 
-=head2 get
+=head2 get - Getting a session
 
-    my $session = $self->app->api->session->get('session_key'); # Return object HelpTasker::API::Session
+    # Return object HelpTasker::API::Session
+    my $session = $self->app->api->session->get('session_key');
 
-=head2 remove
+=head2 remove - Deleting a session
 
     $self->app->api->session->remove('session_key');
 
@@ -147,16 +162,15 @@ HelpTasker::API::Session - The module works with sessions
 
     say dumper $self->app->api->session->get('session_key')->as_hash; # Return ref hashes
 
-=head1 ATTRIBUTES
+=head1 OPERATORS
 
-=head2 session_key - Returns the session key
+=head2 bool
 
-    $session->session_key;
+    my $bool = !!$session;
 
-=head2 session_id - Returns the identifier
+=head2 stringify
 
-    $session->session_id;
-
+    my $str = "$session";
 
 
 =head1 DESCRIPTION
