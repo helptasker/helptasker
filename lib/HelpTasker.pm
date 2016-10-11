@@ -239,6 +239,11 @@ L<HelpTasker> - A powerful tool for creating technical support, and for the acco
 =head1 Modules
  
 L<HelpTasker::API::Session> - A powerful tool for creating technical support, and for the accounting system bugs
+
+L<HelpTasker::API::Email::Mime>
+
+L<HelpTasker::API::Email::Utils>
+
  
 =head1 SEE ALSO
  
