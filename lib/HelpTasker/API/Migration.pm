@@ -20,6 +20,7 @@ __DATA__
 @@ migrations
 -- 1 up
 CREATE TABLE test (message_text varchar(200));
+
 CREATE TABLE projects (
     project_id  SERIAL    PRIMARY KEY,
     name        TEXT      NOT NULL,

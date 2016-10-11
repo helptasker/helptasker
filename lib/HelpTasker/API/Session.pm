@@ -172,6 +172,20 @@ Available after calling methods create or get
 
     my $str = "$session";
 
+=head1 SKILS
+
+    use Carp qw/croak/;
+    my $session_name = "auth";
+    my $session = $self->app->api->session->create($session_name);
+
+    if(my $session = $self->app->api->session->get($session)){
+        croak qq/the session is old/ if($session->as_hash->{'is_valid'} != 1);
+        croak qq/the name is not equal to $session_name/ if($session->as_hash->{'name'} ne $session_name);
+        say dumper $session->as_hash;
+    }
+    else{
+        croak qq/invalid session/;
+    }
 
 =head1 SEE ALSO
 
