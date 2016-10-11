@@ -87,7 +87,7 @@ sub smtp {
     $self->app->log->debug('SMTP DSN:'.join(", ",@dsn)) if(@dsn);
     $self->app->log->debug('SMTP Recipients:'.join(", ",@{$recipients})) if(@dsn);
 
-    $recipients = $smtp->recipient(@{$recipients}, Notify=>\@dsn);
+    $recipients = $smtp->recipient(@{$recipients});
     if ($recipients) {
         $smtp->data();
         $smtp->datasend($_) for (unpack("(A4096)*", $message));

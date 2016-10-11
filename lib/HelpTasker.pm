@@ -52,6 +52,13 @@ sub default_config {
         recipient_check_tld=>1,
         api_prefix_http_header=>"X-HelpTasker",
         session_expiry=>300,
+
+        api_email_mime_default_to=>'devnull@helptasker.org',
+        api_email_mime_default_from=>'devnull@helptasker.org',
+        api_email_mime_default_subject=>'No Subject',
+        api_email_mime_template=>'HelpTasker::API::Email::Mime',
+        api_email_mime_template_section=>'auto_template',
+        api_email_mime_encode=>'base64',
     };
 
     if (defined $ENV{'TRAVIS'}) {
@@ -199,6 +206,25 @@ sub validation {
             }
         }
     );
+
+    # Check email address
+    $self->app->validator->add_check(
+        email => sub {
+            my ($c, $field, $value, $args) = @_;
+            return $self->app->api->email->utils->validator($value,$args) ? undef : 1;
+        }
+    );
+
+    # Check ref object
+    $self->app->validator->add_check(
+        ref => sub {
+            my ($c, $field, $value, $args) = @_;
+            return ref $value eq $args ? undef : 1;
+        }
+    );
+
+#validator
+
     return;
 }
 
