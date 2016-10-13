@@ -25,6 +25,7 @@ WriteMakefile(
         'Data::Random' => '0.12',
         'Mojo::ACME' => '0.07',
         'SQL::Abstract::More' => '1.28',
+        'Cache::Memcached::Fast' => '0.23',
 	},
     EXE_FILES => ['script/helptasker'],
 	test=>{TESTS => 't/*.t t/*/*.t'}
