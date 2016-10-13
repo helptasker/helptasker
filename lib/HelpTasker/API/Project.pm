@@ -61,13 +61,13 @@ sub update {
     $validation->optional('fqdn','trim')->like(qr/^[a-z]{1}[a-z0-9_]+$/x);
     $self->api->utils->error_validation($validation);
 
-    my $set = {date_update => ["current_timestamp"]};
-    $set->{'name'} = $validation->param('name') if($validation->param('name'));
-    $set->{'fqdn'} = $validation->param('fqdn') if($validation->param('fqdn'));
+    my $sql_set = {date_update => ["current_timestamp"]};
+    $sql_set->{'name'} = $validation->param('name') if($validation->param('name'));
+    $sql_set->{'fqdn'} = $validation->param('fqdn') if($validation->param('fqdn'));
 
     my ($sql, @bind) = $self->api->utils->sql->update(
         -table=>'project',
-        -set=>$set,
+        -set=>$sql_set,
         -where=>{project_id=>$validation->param('project_id')}
     );
     $self->app->pg->db->query($sql,@bind);
