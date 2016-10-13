@@ -59,6 +59,8 @@ sub default_config {
         api_email_mime_template=>'HelpTasker::API::Email::Mime',
         api_email_mime_template_section=>'auto_template',
         api_email_mime_encode=>'base64',
+        api_cache_module=>'HelpTasker::API::Cache::Memcached',
+        api_cache_memcached=>'memcached://localhost:11211/helptasker',
     };
 
     if (defined $ENV{'TRAVIS'}) {
@@ -88,18 +90,27 @@ sub helpers {
     $self->plugin('ACME');
 
     for my $module (find_modules 'HelpTasker::API') {
+        next if($module eq 'HelpTasker::API::Cache');
+
         my $e = load_class $module;
         carp qq{Loading "$module" failed: $e} and next if ref $e;
         if ($module =~ m/\:\:([a-z0-9]+)$/xi) {
             my $l = lc($1);
-            $self->helper(
-                'api.' . $l => sub {
-                    my $c   = shift;
-                    my $obj = $module->new(app=>$c->app);
-                    return $obj;
-                }
-            );
+            $self->helper('api.' . $l => sub {
+                my $c   = shift;
+                return $module->new(app=>$c->app);
+            });
         }
+    }
+
+    # Loader modile cache
+    if(my $module = $self->app->config('api_cache_module')){
+        my $e = load_class $module;
+        carp qq{Loading "$module" failed: $e} and next if ref $e;
+        $self->helper('api.cache' => sub {
+            my $c   = shift;
+            return $module->new(app=>$c->app);
+        });
     }
 
     $self->helper('reply.api' => sub {
