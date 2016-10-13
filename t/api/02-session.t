@@ -26,7 +26,12 @@ like($session, qr/^[0-9]+\-[0-9a-z]{40}$/ix, 'ok session_key 1');
 like($session->session_key, qr/^[0-9]+\-[0-9a-z]{40}$/ix, 'ok session_key 2');
 like($session->session_id, qr/^[0-9]+$/ix, 'ok session_id');
 
+note('get only session_id');
+$session = $t->app->api->session->create('test_project');
+my $get = $t->app->api->session->get($session->session_id)->as_hash;
+ok($get->{'session_id'} == $session->session_id, 'check session_id');
 
+note('check params');
 my $types = {
     ru_str=>'Тест',
     en_str=>'Test',
@@ -37,7 +42,7 @@ my $types = {
 };
 
 $session = $t->app->api->session->create('test_project', $types);
-my $get = $t->app->api->session->get($session);
+$get = $t->app->api->session->get($session);
 ok(ref $get eq 'HelpTasker::API::Session', 'ok get object');
 
 $get = $t->app->api->session->get($session)->as_hash;

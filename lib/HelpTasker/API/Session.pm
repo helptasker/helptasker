@@ -2,9 +2,9 @@ package HelpTasker::API::Session;
 use Mojo::Base 'HelpTasker::API::Base';
 use Mojo::Util qw(dumper sha1_sum);
 use Carp qw(croak);
-use Net::IP;
 use Data::Random qw(rand_chars);
 use Mojo::JSON qw(true false);
+
 use overload bool => sub {1}, '""' => sub {shift->session_key }, fallback => 1;
 
 has [qw(session_id session_key _result)];
@@ -12,52 +12,53 @@ has [qw(session_id session_key _result)];
 # Create session
 sub create {
     my ($self,$name,$args) = @_;
-    my $validation = $self->validation->input({name=>$name, expire=>delete $args->{'expire'}, ip=>delete $args->{'ip'}, data=>$args});
+    my $validation = $self->validation->input({
+        name=>$name,
+        expire=>delete $args->{'expire'} || $self->app->config('session_expire') || 300,
+        ip=>delete $args->{'ip'},
+        key=>delete $args->{'key'} || sha1_sum(rand_chars(set=>'all', size=>50)),
+        data=>$args || {},
+    });
+
     $validation->required('name')->like(qr/^[a-z]{1}[a-z0-9\.\_\-]+$/xi);
     $validation->optional('ip','trim');
     $validation->optional('data');
     $validation->optional('expire')->like(qr/^[0-9]+$/x);
+    $validation->optional('key','trim');
     $self->api->utils->error_validation($validation);
 
-    # Generate key
-    my $key = sha1_sum(rand_chars(set=>'all', size=>50));
+    $validation->output->{'data'} = [ "?::json", {json => $validation->param('data') } ];
+    $validation->output->{'date_expire'} = Mojo::Date->new(time+$validation->param('expire'));
 
-    my @values = ();
-    for my $item (qw/key name ip expire data/){
-        if($item eq 'key'){
-            push(@values, $key);
-        }
-        elsif($item eq 'data'){
-            my $val = $validation->param($item) || {};
-            push(@values, {json => $val });
-        }
-        elsif($item eq 'expire'){
-            my $val = $validation->param($item) || $self->app->config('session_expire') || 300;
-            push(@values, Mojo::Date->new(time+$val));
-            push(@values, $val);
-        }
-        else {
-            push(@values, $validation->param($item));
-        }
-    }
-    my $pg = $self->pg->db->query('INSERT INTO session (key,name,ip,date_expire,expire,data) VALUES(?,?,?,?,?,?::json) RETURNING session_id',@values);
+    my ($sql, @bind) = $self->api->utils->sql->insert(
+        -into=>'session',
+        -values=>$validation->output,
+        -returning=>'session_id',
+    );
+    my $pg = $self->pg->db->query($sql,@bind);
+
     $self->session_id($pg->hash->{'session_id'});
-    $self->session_key($self->session_id."-".$key);
+    $self->session_key($self->session_id."-".$validation->param('key'));
     return $self;
 }
 
 sub get {
     my ($self,$id) = @_;
 
-    my $pg;
-    my $fields = "session_id, name, key, ip, date_create, date_update, date_expire, expire, data, extract(epoch FROM age(date_expire,current_timestamp)) as age";
-
-    if(defined $id && $id =~ m/^([0-9]+)\-([0-9a-z]+)$/xi){
-       $pg = $self->pg->db->query("SELECT $fields FROM session WHERE session_id = ? AND key = ?",$1,$2);
+    my $where = {};
+    if(defined $id && $id =~ m/^(?<session_id>[0-9]+)\-(?<key>[0-9a-z]{40})$/xi){
+        $where = {session_id=>$+{'session_id'}, key=>$+{'key'}};
     }
     else {
-       $pg = $self->pg->db->query("SELECT $fields FROM session WHERE session_id = ?",$id);
+        $where = {session_id=>$id};
     }
+
+    my @columns = qw/session_id key name ip date_expire expire data/;
+    push(@columns,'extract(epoch FROM age(date_expire,current_timestamp)) as age');
+
+    my ($sql, @bind) = $self->api->utils->sql->select(-columns=>\@columns, -from=>'session', -where=>$where);
+    my $pg = $self->pg->db->query($sql,@bind);
+
     return $self if(!defined $pg);
     return if($pg->rows == 0);
 
@@ -73,20 +74,22 @@ sub get {
 sub remove {
     my ($self,$id) = @_;
 
-    if(defined $id && $id =~ m/^([0-9]+)\-([0-9a-z]+)$/xi){
-       $self->pg->db->query("DELETE FROM session WHERE session_id = ? AND key = ?",$1,$2);
+    my $where = {};
+    if(defined $id && $id =~ m/^(?<session_id>[0-9]+)\-(?<key>[0-9a-z]{40})$/xi){
+        $where = {session_id=>$+{'session_id'}, key=>$+{'key'}};
     }
     else {
-       $self->pg->db->query("DELETE FROM session WHERE session_id = ?",$id);
+        $where = {session_id=>$id};
     }
+
+    my ($sql, @bind) = $self->api->utils->sql->delete(-from=>'session',-where=>$where);
+    $self->pg->db->query($sql,@bind);
     return;
 }
 
 sub as_hash {
     return shift->_result;
 }
-    #my $cb = ref $_[-1] eq 'CODE' ? pop : undef;
-
 
 1;
 

@@ -21,7 +21,7 @@ __DATA__
 -- 1 up
 CREATE TABLE test (message_text varchar(200));
 
-CREATE TABLE projects (
+CREATE TABLE project (
     project_id  SERIAL    PRIMARY KEY,
     name        TEXT      NOT NULL,
     date_create TIMESTAMP with time zone NOT NULL DEFAULT current_timestamp,
@@ -43,7 +43,7 @@ CREATE TABLE session (
 
 -- 1 down
 DROP TABLE IF EXISTS test;
-DROP TABLE IF EXISTS projects;
+DROP TABLE IF EXISTS project;
 DROP TABLE IF EXISTS session;
 
 

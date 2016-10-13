@@ -128,6 +128,7 @@ sub helpers {
 
 sub hooks {
     my ($self) = @_;
+
     $self->hook(before_routes => sub {
         my $c = shift;
 
@@ -168,11 +169,8 @@ sub hooks {
                 }
             };
         }
-        else{
-            return $next->();
-        }
+        return $next->();
     });
-
     return;
 }
 
@@ -200,7 +198,8 @@ sub validation {
         id => sub {
             my ($c, $field, $value, @args) = @_;
             if(defined $field && $field eq 'project_id' && defined $value && $value){
-                my $pg = $self->app->pg->db->query("SELECT project_id FROM projects WHERE project_id = ? LIMIT 1",$value);
+                my ($sql, @bind) = $self->api->utils->sql->select(-columns=>[qw/project_id/], -from=>'project', -where=>{project_id=>$value});
+                my $pg = $self->app->pg->db->query($sql,@bind);
                 my $rows = $pg->rows;
                 return defined $rows && $rows ? undef : 1;
             }
@@ -222,8 +221,6 @@ sub validation {
             return ref $value eq $args ? undef : 1;
         }
     );
-
-#validator
 
     return;
 }

@@ -169,8 +169,6 @@ __DATA__
                     <%= $result->{'documentation'} %>
                 </div>
             </div>
-
-
         </div>
     </body>
 </html>

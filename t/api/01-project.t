@@ -9,6 +9,19 @@ $ENV{'MOJO_TEST'} = 1;
 
 my $t = Test::Mojo->new('HelpTasker');
 ok(ref $t->app->api->project eq 'HelpTasker::API::Project', 'ok object');
+$t->app->api->migration->clear; # reset db
+
+my $project_id = $t->app->api->project->create('test project', {fqdn=>'test_project'});
+$t->app->api->project->get($project_id);
+
+$t->app->api->project->update($project_id, {name=>'111'});
+
+#$t->app->api->project->flush($project_id);
+
+
+
+done_testing();
+__END__
 
 subtest 'method create' => sub {
     $t->app->api->migration->clear; # reset db

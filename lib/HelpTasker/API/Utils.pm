@@ -2,6 +2,7 @@ package HelpTasker::API::Utils;
 use Mojo::Base 'HelpTasker::API::Base';
 use Mojo::Util qw(dumper decode);
 use Carp qw(croak confess);
+use SQL::Abstract::More;
 
 sub error_tx {
     my ($self, $tx) = @_;
@@ -32,7 +33,11 @@ sub error_validation {
     return;
 }
 
-
+sub sql {
+    my ($self) = @_;
+    return SQL::Abstract::More->new();
+;
+}
 
 1;
 

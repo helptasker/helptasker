@@ -4,30 +4,100 @@ use Mojo::Util qw(dumper);
 use Carp qw(croak);
 use overload bool => sub {1}, fallback => 1;
 
-has [qw(name fqdn project_id date_create date_update)];
+has [qw(project_id _result)];
 
 # New project
 sub create {
-    my ($self,%param) = @_;
-    $param{'name'} ||= $self->name;
-    $param{'fqdn'} ||= $self->fqdn;
-
-    my $validation = $self->validation->input(\%param);
+    my ($self,$name,$args) = @_;
+    my $validation = $self->validation->input({
+        name=>$name,
+        fqdn=>delete $args->{'fqdn'},
+    });
     $validation->required('name');
     $validation->required('fqdn','trim')->like(qr/^[a-z]{1}[a-z0-9_]+$/x);
-    $self->app->api->utils->error_validation($validation);
+    $self->api->utils->error_validation($validation);
 
-    my @id = ();
-    for my $item (qw/name fqdn/){
-        push(@id, $validation->param($item));
-        $self->$item($validation->param($item));
-    }
+    my ($sql, @bind) = $self->api->utils->sql->insert(
+        -into=>'project',
+        -values=>$validation->output,
+        -returning=>'project_id',
+    );
+    my $pg = $self->app->pg->db->query($sql,@bind);
+    return $pg->hash->{'project_id'};
+}
 
-    my $pg = $self->app->pg->db->query('INSERT INTO projects (name,fqdn) VALUES(?,?) RETURNING project_id',@id);
-    $self->project_id($pg->hash->{'project_id'});
-    $self->get;
+# Get project
+sub get {
+    my ($self,$project_id,$args) = @_;
+    my $validation = $self->validation->input({
+        project_id=>$project_id,
+    });
+    $validation->required('project_id')->like(qr/^[0-9]+$/x)->id('project_id');
+    $self->api->utils->error_validation($validation);
+
+    my ($sql, @bind) = $self->api->utils->sql->select(
+        -columns=>[qw/project_id name fqdn date_create date_update/],
+        -from=>'project',
+        -where=>$validation->output,
+    );
+    my $pg = $self->app->pg->db->query($sql,@bind);
+    my $result = $pg->hash;
+    $self->app->pg->db->query($sql,@bind);
+    $self->_result($result);
     return $self;
 }
+
+# Updating project
+sub update {
+    my ($self,$project_id,$args) = @_;
+    my $validation = $self->validation->input({
+        project_id=>$project_id,
+        name=>delete $args->{'name'},
+        fqdn=>delete $args->{'fqdn'},
+    });
+
+    $validation->required('project_id')->like(qr/^[0-9]+$/x)->id('project_id');
+    $validation->optional('name');
+    $validation->optional('fqdn','trim')->like(qr/^[a-z]{1}[a-z0-9_]+$/x);
+    $self->api->utils->error_validation($validation);
+
+    my $set = {date_update => ["current_timestamp"]};
+    $set->{'name'} = $validation->param('name') if($validation->param('name'));
+    $set->{'fqdn'} = $validation->param('fqdn') if($validation->param('fqdn'));
+
+    my ($sql, @bind) = $self->api->utils->sql->update(
+        -table=>'project',
+        -set=>$set,
+        -where=>{project_id=>$validation->param('project_id')}
+    );
+    $self->app->pg->db->query($sql,@bind);
+    return $self;
+}
+
+# System Project Update
+sub flush {
+    my ($self,$project_id,$args) = @_;
+    my $validation = $self->validation->input({
+        project_id=>$project_id,
+    });
+    $validation->required('project_id')->like(qr/^[0-9]+$/x)->id('project_id');
+    $self->api->utils->error_validation($validation);
+
+    my ($sql, @bind) = $self->api->utils->sql->update(
+        -table=>'project',
+        -set=>{ date_update => ["current_timestamp"] },
+        -where=>$validation->output
+    );
+    $self->app->pg->db->query($sql,@bind);
+    return $self;
+}
+
+sub as_hash {
+    return shift->_result;
+}
+
+1;
+__END__
 
 # Get project
 sub get {
@@ -111,5 +181,6 @@ sub to_hash {
 }
 
 1;
+
 
 
