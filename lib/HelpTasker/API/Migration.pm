@@ -41,9 +41,19 @@ CREATE TABLE session (
     data         JSON      NOT NULL
 );
 
+CREATE TABLE cache (
+    cache_id    SERIAL    PRIMARY KEY,
+    date_create TIMESTAMP with time zone NOT NULL DEFAULT current_timestamp,
+    date_expire TIMESTAMP with time zone NOT NULL DEFAULT current_timestamp,
+    key         TEXT      UNIQUE NOT NULL,
+    value       JSON      NOT NULL
+);
+
+
 -- 1 down
 DROP TABLE IF EXISTS test;
 DROP TABLE IF EXISTS project;
 DROP TABLE IF EXISTS session;
+DROP TABLE IF EXISTS cache;
 
 

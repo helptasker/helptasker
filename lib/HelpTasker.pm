@@ -59,8 +59,7 @@ sub default_config {
         api_email_mime_template=>'HelpTasker::API::Email::Mime',
         api_email_mime_template_section=>'auto_template',
         api_email_mime_encode=>'base64',
-        api_cache_module=>'HelpTasker::API::Cache::Memcached',
-        api_cache_memcached=>'memcached://localhost:11211/helptasker',
+        api_cache_module=>'HelpTasker::API::Cache::DB',
     };
 
     if (defined $ENV{'TRAVIS'}) {
