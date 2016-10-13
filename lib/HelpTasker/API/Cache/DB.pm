@@ -4,11 +4,6 @@ use Mojo::Util qw(dumper);
 use Carp qw(croak);
 use overload bool => sub {1}, fallback => 1;
 
-sub db {
-    my $self = shift;
-    my $url = Mojo::URL->new($self->app->config('api_cache_memcached'));
-}
-
 sub save {
     my ($self,$key,$value,$expire) = @_;
     my $validation = $self->validation->input({key=>$key, value=>$value, expire=>$expire});
