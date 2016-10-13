@@ -4,6 +4,26 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
 	VERSION   => '0.01',
+    META_MERGE => {
+        dynamic_config => 0,
+        'meta-spec'    => {version => 2},
+        no_index       => {directory => ['t']},
+        prereqs        => {
+            runtime => {
+                requires => {perl => '5.010001'}
+            }
+        },
+        resources      => {
+            bugtracker => {web => 'https://github.com/helptasker/helptasker/issues'},
+            homepage   => 'http://helptasker.org',
+            license    => ['http://www.perlfoundation.org/artistic_license_2_0'],
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/helptasker/helptasker.git',
+                web  => 'https://github.com/helptasker/helptasker/',
+            },
+        },
+    },
     PREREQ_PM    => {
 		'Mojolicious' => '7.06',
 		'DBI' => '1.631',
