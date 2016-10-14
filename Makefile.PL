@@ -3,7 +3,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
-	VERSION   => '0.01',
+    VERSION   => '0.01',
     META_MERGE => {
         dynamic_config => 0,
         'meta-spec'    => {version => 2},
@@ -14,7 +14,9 @@ WriteMakefile(
             }
         },
         resources      => {
-            bugtracker => {web => 'https://github.com/helptasker/helptasker/issues'},
+            bugtracker => {
+                web => 'https://github.com/helptasker/helptasker/issues'
+            },
             homepage   => 'http://helptasker.org',
             license    => ['http://www.perlfoundation.org/artistic_license_2_0'],
             repository => {
