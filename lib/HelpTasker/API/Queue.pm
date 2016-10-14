@@ -15,7 +15,7 @@ sub create {
         settings=>$args,
     });
     $validation->required('name');
-    $validation->required('type','trim')->like(qr/^[0-9]$/);
+    $validation->required('type','trim')->like(qr/^[0-9]$/x);
     $validation->required('project_id')->like(qr/^[0-9]+$/x)->id('project_id');
     $validation->optional('settings')->ref('HASH');
     $self->api->utils->error_validation($validation);
@@ -65,7 +65,7 @@ sub update {
 
     $validation->required('queue_id')->like(qr/^[0-9]+$/x)->id('queue_id');
     $validation->optional('name');
-    $validation->required('type','trim')->like(qr/^[0-9]$/);
+    $validation->required('type','trim')->like(qr/^[0-9]$/x);
     $validation->optional('settings')->ref('HASH');
     $self->api->utils->error_validation($validation);
 
