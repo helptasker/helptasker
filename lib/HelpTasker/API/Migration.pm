@@ -26,7 +26,8 @@ CREATE TABLE project (
     name        TEXT      NOT NULL,
     date_create TIMESTAMP with time zone NOT NULL DEFAULT current_timestamp,
     date_update TIMESTAMP with time zone NOT NULL DEFAULT current_timestamp,
-    fqdn        TEXT      UNIQUE NOT NULL
+    fqdn        TEXT      UNIQUE NOT NULL,
+    data        JSON      NOT NULL
 );
 
 CREATE TABLE session (

@@ -145,7 +145,6 @@ sub hooks {
         my $ip = $c->req->headers->header('X-Real-IP') || $c->req->headers->header('X-Forwarded-For') || $c->tx->remote_address;
         $self->app->log->info('Remote Address ' . $ip);
 
-
         #if($c->req->url->to_string =~ m/^\/api\//ix){
         #    if(my $timezone = $c->req->headers->header('x-helptasker-timezone')){
         #        $c->pg->on(connection => sub {

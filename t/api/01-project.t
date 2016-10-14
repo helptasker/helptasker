@@ -12,131 +12,36 @@ ok(ref $t->app->api->project eq 'HelpTasker::API::Project', 'ok object');
 $t->app->api->migration->clear; # reset db
 
 my $project_id = $t->app->api->project->create('test project', {fqdn=>'test_project'});
-$t->app->api->project->get($project_id);
+ok(ref $project_id eq 'HelpTasker::API::Project','check obj');
+like($project_id,qr/^[0-9]+$/,'check project_id');
 
-$t->app->api->project->update($project_id, {name=>'111'});
-
-#$t->app->api->project->flush($project_id);
-
-
-
-done_testing();
-__END__
-
-subtest 'method create' => sub {
-    $t->app->api->migration->clear; # reset db
-    my $project = $t->app->api->project->create(name=>'test project', fqdn=>'test_project');
-    ok(ref $project eq 'HelpTasker::API::Project', 'ok object');
-
-    $project = $project->to_hash;
-    ok($project->{'project_id'} == 1, 'project_id');
-    ok($project->{'name'} eq 'test project', 'name');
-    ok($project->{'fqdn'} eq 'test_project', 'fqdn');
-    like($project->{'date_create'}, qr/[0-9]{4}-[0-9]{2}-[0-9]{2}\s[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]+\+[0-9]+/, 'date_create');
-    like($project->{'date_update'}, qr/[0-9]{4}-[0-9]{2}-[0-9]{2}\s[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]+\+[0-9]+/, 'date_update');
+try {
+    $t->app->api->project->create();
+}
+catch {
+    like($_, qr/invalid param field:fqdn, check:required/, 'error check fqdn');
 };
 
-subtest 'method get' => sub {
-    $t->app->api->migration->clear; # reset db
+my $project = $t->app->api->project->get($project_id);
+ok(ref $project_id eq 'HelpTasker::API::Project','check obj');
+$project = $project->as_hash;
+ok($project->{'name'} eq 'test project', 'name');
+ok($project->{'fqdn'} eq 'test_project', 'fqdn');
+like($project->{'date_create'}, qr/[0-9]{4}-[0-9]{2}-[0-9]{2}\s[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]+\+[0-9]+/, 'date_create');
+like($project->{'date_update'}, qr/[0-9]{4}-[0-9]{2}-[0-9]{2}\s[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]+\+[0-9]+/, 'date_update');
 
-    my $project = $t->app->api->project->create(name=>'test project', fqdn=>'test_project');
-    ok(ref $project eq 'HelpTasker::API::Project', 'ok object');
+$project = $t->app->api->project->update($project_id, {name=>'test project2', fqdn=>'test_project2', param=>1});
+ok(ref $project eq 'HelpTasker::API::Project','check obj');
 
-    $project = $t->app->api->project->get(project_id=>$project->project_id);
-    ok($project->{'project_id'} == 1, 'project_id');
-    ok($project->{'name'} eq 'test project', 'name');
-    ok($project->{'fqdn'} eq 'test_project', 'fqdn');
-    like($project->{'date_create'}, qr/[0-9]{4}-[0-9]{2}-[0-9]{2}\s[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]+\+[0-9]+/, 'date_create');
-    like($project->{'date_update'}, qr/[0-9]{4}-[0-9]{2}-[0-9]{2}\s[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]+\+[0-9]+/, 'date_update');
-};
+$project = $project->get($project)->as_hash;
+ok($project->{'name'} eq 'test project2', 'name');
+ok($project->{'fqdn'} eq 'test_project2', 'fqdn');
+like($project->{'date_create'}, qr/[0-9]{4}-[0-9]{2}-[0-9]{2}\s[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]+\+[0-9]+/, 'date_create');
+like($project->{'date_update'}, qr/[0-9]{4}-[0-9]{2}-[0-9]{2}\s[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]+\+[0-9]+/, 'date_update');
+ok($project->{'data'}->{'param'} == 1, 'check param');
 
-subtest 'method remove' => sub {
-    $t->app->api->migration->clear; # reset db
-    my $project = $t->app->api->project->create(name=>'test project', fqdn=>'test_project');
-    ok(ref $project eq 'HelpTasker::API::Project', 'ok object');
-
-    $t->app->api->project->remove(project_id=>$project->project_id);
-
-    try {
-        $t->app->api->project->get(project_id=>$project->project_id);
-    }
-    catch {
-        like($_, qr/invalid param field:project_id, check:id/, 'ok delete');
-    };
-};
-
-subtest 'method update' => sub {
-    $t->app->api->migration->clear; # reset db
-    my $project = $t->app->api->project->create(name=>'test project', fqdn=>'test_project');
-    ok(ref $project eq 'HelpTasker::API::Project', 'ok object');
-
-    $project = $t->app->api->project->update(project_id=>$project->project_id, name=>'test project2', fqdn=>'test_project2');
-
-    ok($project->{'project_id'} == 1, 'project_id');
-    ok($project->{'name'} eq 'test project2', 'name');
-    ok($project->{'fqdn'} eq 'test_project2', 'fqdn');
-    like($project->{'date_create'}, qr/^[0-9]{4}-[0-9]{2}-[0-9]{2}\s[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]+\+[0-9]+$/, 'date_create');
-    like($project->{'date_update'}, qr/^[0-9]{4}-[0-9]{2}-[0-9]{2}\s[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]+\+[0-9]+$/, 'date_update');
-};
-
-subtest 'error check' => sub {
-    $t->app->api->migration->clear; # reset db
-
-    try {
-        $t->app->api->project->create(fqdn=>'test project');
-    }
-    catch {
-        like($_, qr/invalid param field:fqdn, check:like/);
-    };
-
-    try {
-        $t->app->api->project->create(fqdn=>'test_project');
-    }
-    catch {
-        like($_, qr/invalid param field:name, check:required/);
-    };
-
-    try {
-        $t->app->api->project->create(name=>'test project');
-    }
-    catch {
-        like($_, qr/invalid param field:fqdn, check:required/);
-    };
-};
-
-subtest 'HTTP API' => sub {
-    $t->app->api->migration->clear; # reset db
-    $t->post_ok('/api/v1/project/'=>json=>{name=>'test project', fqdn=>'test_project'})
-        ->status_is(200)
-        ->json_is('/status' => 200)
-        ->json_is('/response/fqdn' => 'test_project')
-        ->json_is('/response/name' => 'test project')
-        ->json_like('/response/date_create' => qr/^[0-9]{4}-[0-9]{2}-[0-9]{2}\s[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]+\+[0-9]+$/x)
-        ->json_like('/response/date_update' => qr/^[0-9]{4}-[0-9]{2}-[0-9]{2}\s[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]+\+[0-9]+$/x)
-        ->json_like('/response/project_id' => qr/^[0-9]+$/x)
-    ;
-
-    my $project_id = $t->tx->res->json->{'response'}->{'project_id'};
-
-    $t->get_ok("/api/v1/project/?project_id=$project_id")
-        ->status_is(200)
-        ->json_is('/status' => 200)
-        ->json_is('/response/fqdn' => 'test_project')
-        ->json_is('/response/name' => 'test project')
-        ->json_like('/response/date_create' => qr/^[0-9]{4}-[0-9]{2}-[0-9]{2}\s[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]+\+[0-9]+$/x)
-        ->json_like('/response/date_update' => qr/^[0-9]{4}-[0-9]{2}-[0-9]{2}\s[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]+\+[0-9]+$/x)
-        ->json_like('/response/project_id' => qr/^[0-9]+$/x)
-    ;
-
-    $t->put_ok('/api/v1/project/'=>json=>{name=>'test project2', fqdn=>'test_project2', project_id=>$project_id})
-        ->status_is(200)
-        ->json_is('/status' => 200)
-        ->json_is('/response/fqdn' => 'test_project2')
-        ->json_is('/response/name' => 'test project2')
-        ->json_like('/response/date_create' => qr/^[0-9]{4}-[0-9]{2}-[0-9]{2}\s[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]+\+[0-9]+$/x)
-        ->json_like('/response/date_update' => qr/^[0-9]{4}-[0-9]{2}-[0-9]{2}\s[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]+\+[0-9]+$/x)
-        ->json_like('/response/project_id' => qr/^[0-9]+$/x)
-    ;
-};
+my $date_update = $project->{'date_update'};
+$project = $t->app->api->project->flush($project->{'project_id'})->get($project->{'project_id'})->as_hash;
+ok($date_update ne $project->{'date_update'}, 'check flush');
 
 done_testing();

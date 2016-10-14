@@ -2,7 +2,7 @@ package HelpTasker::API::Project;
 use Mojo::Base 'HelpTasker::API::Base';
 use Mojo::Util qw(dumper);
 use Carp qw(croak);
-use overload bool => sub {1}, fallback => 1;
+use overload bool => sub {1}, '""' => sub {shift->project_id }, fallback => 1;
 
 has [qw(project_id _result)];
 
@@ -12,10 +12,14 @@ sub create {
     my $validation = $self->validation->input({
         name=>$name,
         fqdn=>delete $args->{'fqdn'},
+        data=>$args,
     });
     $validation->required('name');
     $validation->required('fqdn','trim')->like(qr/^[a-z]{1}[a-z0-9_]+$/x);
+    $validation->optional('data')->ref('HASH');
     $self->api->utils->error_validation($validation);
+
+    $validation->output->{'data'} = [ "?::json", {json => $validation->param('data') } ];
 
     my ($sql, @bind) = $self->api->utils->sql->insert(
         -into=>'project',
@@ -23,7 +27,8 @@ sub create {
         -returning=>'project_id',
     );
     my $pg = $self->app->pg->db->query($sql,@bind);
-    return $pg->hash->{'project_id'};
+    $self->project_id($pg->hash->{'project_id'});
+    return $self;
 }
 
 # Get project
@@ -36,14 +41,14 @@ sub get {
     $self->api->utils->error_validation($validation);
 
     my ($sql, @bind) = $self->api->utils->sql->select(
-        -columns=>[qw/project_id name fqdn date_create date_update/],
+        -columns=>[qw/project_id name fqdn date_create date_update data/],
         -from=>'project',
         -where=>$validation->output,
     );
     my $pg = $self->app->pg->db->query($sql,@bind);
-    my $result = $pg->hash;
-    $self->app->pg->db->query($sql,@bind);
+    my $result = $pg->expand->hash;
     $self->_result($result);
+    $self->project_id($project_id);
     return $self;
 }
 
@@ -54,16 +59,19 @@ sub update {
         project_id=>$project_id,
         name=>delete $args->{'name'},
         fqdn=>delete $args->{'fqdn'},
+        data=>$args,
     });
 
     $validation->required('project_id')->like(qr/^[0-9]+$/x)->id('project_id');
     $validation->optional('name');
     $validation->optional('fqdn','trim')->like(qr/^[a-z]{1}[a-z0-9_]+$/x);
+    $validation->optional('data')->ref('HASH');
     $self->api->utils->error_validation($validation);
 
     my $sql_set = {date_update => ["current_timestamp"]};
-    $sql_set->{'name'} = $validation->param('name') if($validation->param('name'));
-    $sql_set->{'fqdn'} = $validation->param('fqdn') if($validation->param('fqdn'));
+    $sql_set->{'name'} = $validation->param('name')                           if($validation->param('name'));
+    $sql_set->{'fqdn'} = $validation->param('fqdn')                           if($validation->param('fqdn'));
+    $sql_set->{'data'} = [ "?::json", {json => $validation->param('data') } ] if($validation->param('data'));
 
     my ($sql, @bind) = $self->api->utils->sql->update(
         -table=>'project',
@@ -71,6 +79,8 @@ sub update {
         -where=>{project_id=>$validation->param('project_id')}
     );
     $self->app->pg->db->query($sql,@bind);
+    $self->flush($project_id);
+    $self->project_id($project_id);
     return $self;
 }
 
@@ -89,6 +99,7 @@ sub flush {
         -where=>$validation->output
     );
     $self->app->pg->db->query($sql,@bind);
+    $self->project_id($project_id);
     return $self;
 }
 
