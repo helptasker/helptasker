@@ -38,7 +38,7 @@ ok($project->{'name'} eq 'test project2', 'name');
 ok($project->{'fqdn'} eq 'test_project2', 'fqdn');
 like($project->{'date_create'}, qr/[0-9]{4}-[0-9]{2}-[0-9]{2}\s[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]+\+[0-9]+/, 'date_create');
 like($project->{'date_update'}, qr/[0-9]{4}-[0-9]{2}-[0-9]{2}\s[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]+\+[0-9]+/, 'date_update');
-ok($project->{'data'}->{'param'} == 1, 'check param');
+ok($project->{'settings'}->{'param'} == 1, 'check param');
 
 my $date_update = $project->{'date_update'};
 $project = $t->app->api->project->flush($project->{'project_id'})->get($project->{'project_id'})->as_hash;

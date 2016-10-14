@@ -10,15 +10,17 @@ sub create {
     my ($self,$name,$args) = @_;
     my $validation = $self->validation->input({
         name=>$name,
+        project_id=>delete $args->{'project_id'},
         type=>delete $args->{'type'},
-        data=>$args,
+        settings=>$args,
     });
     $validation->required('name');
     $validation->required('type','trim')->like(qr/^[0-9]$/);
-    $validation->optional('data')->ref('HASH');
+    $validation->required('project_id')->like(qr/^[0-9]+$/x)->id('project_id');
+    $validation->optional('settings')->ref('HASH');
     $self->api->utils->error_validation($validation);
 
-    $validation->output->{'data'} = [ "?::json", {json => $validation->param('data') } ];
+    $validation->output->{'settings'} = [ "?::json", {json => $validation->param('settings') } ];
 
     my ($sql, @bind) = $self->api->utils->sql->insert(
         -into=>'queue',
@@ -40,7 +42,7 @@ sub get {
     $self->api->utils->error_validation($validation);
 
     my ($sql, @bind) = $self->api->utils->sql->select(
-        -columns=>[qw/queue_id name date_create date_update data/],
+        -columns=>[qw/queue_id name date_create date_update settings project_id/],
         -from=>'queue',
         -where=>$validation->output,
     );
@@ -58,19 +60,20 @@ sub update {
         queue_id=>$queue_id,
         name=>delete $args->{'name'},
         type=>delete $args->{'type'},
-        data=>$args,
+        settings=>$args,
     });
 
     $validation->required('queue_id')->like(qr/^[0-9]+$/x)->id('queue_id');
     $validation->optional('name');
     $validation->required('type','trim')->like(qr/^[0-9]$/);
-    $validation->optional('data')->ref('HASH');
+    $validation->optional('settings')->ref('HASH');
     $self->api->utils->error_validation($validation);
 
     my $sql_set = {date_update => ["current_timestamp"]};
-    $sql_set->{'name'} = $validation->param('name')                           if($validation->param('name'));
-    $sql_set->{'type'} = $validation->param('type')                           if($validation->param('type'));
-    $sql_set->{'data'} = [ "?::json", {json => $validation->param('data') } ] if($validation->param('data'));
+    $sql_set->{'name'}     = $validation->param('name')                               if($validation->param('name'));
+    $sql_set->{'type'}     = $validation->param('type')                               if($validation->param('type'));
+    $sql_set->{'settings'} = [ "?::json", {json => $validation->param('settings') } ] if($validation->param('settings'));
+
 
     my ($sql, @bind) = $self->api->utils->sql->update(
         -table=>'queue',

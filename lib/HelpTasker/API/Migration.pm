@@ -27,7 +27,7 @@ CREATE TABLE project (
     date_create TIMESTAMP with time zone NOT NULL DEFAULT current_timestamp,
     date_update TIMESTAMP with time zone NOT NULL DEFAULT current_timestamp,
     fqdn        TEXT      UNIQUE NOT NULL,
-    data        JSON      NOT NULL
+    settings    JSON      NOT NULL
 );
 
 CREATE TABLE session (
@@ -52,18 +52,18 @@ CREATE TABLE cache (
 
 CREATE TABLE queue (
     queue_id    SERIAL    PRIMARY KEY,
+    project_id  INTEGER   REFERENCES project ON DELETE CASCADE,
     date_create TIMESTAMP with time zone NOT NULL DEFAULT current_timestamp,
     date_update TIMESTAMP with time zone NOT NULL DEFAULT current_timestamp,
     name        TEXT      NOT NULL,
     type        SMALLINT  NOT NULL,
-    data        JSON      NOT NULL
+    settings    JSON      NOT NULL
 );
 
 -- 1 down
 DROP TABLE IF EXISTS test;
-DROP TABLE IF EXISTS project;
 DROP TABLE IF EXISTS session;
 DROP TABLE IF EXISTS cache;
 DROP TABLE IF EXISTS queue;
-
+DROP TABLE IF EXISTS project;
 

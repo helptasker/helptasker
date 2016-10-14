@@ -12,14 +12,14 @@ sub create {
     my $validation = $self->validation->input({
         name=>$name,
         fqdn=>delete $args->{'fqdn'},
-        data=>$args,
+        settings=>$args,
     });
     $validation->required('name');
     $validation->required('fqdn','trim')->like(qr/^[a-z]{1}[a-z0-9_]+$/x);
-    $validation->optional('data')->ref('HASH');
+    $validation->optional('settings')->ref('HASH');
     $self->api->utils->error_validation($validation);
 
-    $validation->output->{'data'} = [ "?::json", {json => $validation->param('data') } ];
+    $validation->output->{'settings'} = [ "?::json", {json => $validation->param('settings') } ];
 
     my ($sql, @bind) = $self->api->utils->sql->insert(
         -into=>'project',
@@ -41,7 +41,7 @@ sub get {
     $self->api->utils->error_validation($validation);
 
     my ($sql, @bind) = $self->api->utils->sql->select(
-        -columns=>[qw/project_id name fqdn date_create date_update data/],
+        -columns=>[qw/project_id name fqdn date_create date_update settings/],
         -from=>'project',
         -where=>$validation->output,
     );
@@ -59,19 +59,19 @@ sub update {
         project_id=>$project_id,
         name=>delete $args->{'name'},
         fqdn=>delete $args->{'fqdn'},
-        data=>$args,
+        settings=>$args,
     });
 
     $validation->required('project_id')->like(qr/^[0-9]+$/x)->id('project_id');
     $validation->optional('name');
     $validation->optional('fqdn','trim')->like(qr/^[a-z]{1}[a-z0-9_]+$/x);
-    $validation->optional('data')->ref('HASH');
+    $validation->optional('settings')->ref('HASH');
     $self->api->utils->error_validation($validation);
 
     my $sql_set = {date_update => ["current_timestamp"]};
-    $sql_set->{'name'} = $validation->param('name')                           if($validation->param('name'));
-    $sql_set->{'fqdn'} = $validation->param('fqdn')                           if($validation->param('fqdn'));
-    $sql_set->{'data'} = [ "?::json", {json => $validation->param('data') } ] if($validation->param('data'));
+    $sql_set->{'name'}     = $validation->param('name')                               if($validation->param('name'));
+    $sql_set->{'fqdn'}     = $validation->param('fqdn')                               if($validation->param('fqdn'));
+    $sql_set->{'settings'} = [ "?::json", {json => $validation->param('settings') } ] if($validation->param('settings'));
 
     my ($sql, @bind) = $self->api->utils->sql->update(
         -table=>'project',
