@@ -50,11 +50,20 @@ CREATE TABLE cache (
     value       JSON      NOT NULL
 );
 
+CREATE TABLE queue (
+    queue_id    SERIAL    PRIMARY KEY,
+    date_create TIMESTAMP with time zone NOT NULL DEFAULT current_timestamp,
+    date_update TIMESTAMP with time zone NOT NULL DEFAULT current_timestamp,
+    name        TEXT      NOT NULL,
+    type        SMALLINT  NOT NULL,
+    data        JSON      NOT NULL
+);
 
 -- 1 down
 DROP TABLE IF EXISTS test;
 DROP TABLE IF EXISTS project;
 DROP TABLE IF EXISTS session;
 DROP TABLE IF EXISTS cache;
+DROP TABLE IF EXISTS queue;
 
 

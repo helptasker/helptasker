@@ -212,6 +212,12 @@ sub validation {
                 my $rows = $pg->rows;
                 return defined $rows && $rows ? undef : 1;
             }
+            elsif(defined $field && $field eq 'queue_id' && defined $value && $value){
+                my ($sql, @bind) = $self->api->utils->sql->select(-columns=>[qw/queue_id/], -from=>'queue', -where=>{queue_id=>$value});
+                my $pg = $self->app->pg->db->query($sql,@bind);
+                my $rows = $pg->rows;
+                return defined $rows && $rows ? undef : 1;
+            }
         }
     );
 
