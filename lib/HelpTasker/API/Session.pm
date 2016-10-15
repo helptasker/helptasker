@@ -20,8 +20,8 @@ sub create {
         data=>$args || {},
     });
 
-    $validation->required('name')->like(qr/^[a-z]{1}[a-z0-9\.\_\-]+$/xi);
-    $validation->optional('ip','trim');
+    $validation->required('name','trim')->like(qr/^[a-z]{1}[a-z0-9\.\_\-]+$/xi);
+    $validation->optional('ip','gap','lc');
     $validation->optional('data');
     $validation->optional('expire')->like(qr/^[0-9]+$/x);
     $validation->optional('key','trim');

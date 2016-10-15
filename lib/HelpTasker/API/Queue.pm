@@ -14,9 +14,9 @@ sub create {
         type=>delete $args->{'type'},
         settings=>$args,
     });
-    $validation->required('name');
-    $validation->required('type','trim')->like(qr/^[0-9]$/x);
-    $validation->required('project_id')->like(qr/^[0-9]+$/x)->id('project_id');
+    $validation->required('name','trim');
+    $validation->required('type','gap')->like(qr/^[0-9]$/x);
+    $validation->required('project_id','gap')->like(qr/^[0-9]+$/x)->id('project_id');
     $validation->optional('settings')->ref('HASH');
     $self->api->utils->error_validation($validation);
 
@@ -38,7 +38,7 @@ sub get {
     my $validation = $self->validation->input({
         queue_id=>$queue_id,
     });
-    $validation->required('queue_id')->like(qr/^[0-9]+$/x)->id('queue_id');
+    $validation->required('queue_id','gap')->like(qr/^[0-9]+$/x)->id('queue_id');
     $self->api->utils->error_validation($validation);
 
     my ($sql, @bind) = $self->api->utils->sql->select(
@@ -63,8 +63,8 @@ sub update {
         settings=>$args,
     });
 
-    $validation->required('queue_id')->like(qr/^[0-9]+$/x)->id('queue_id');
-    $validation->optional('name');
+    $validation->required('queue_id','gap')->like(qr/^[0-9]+$/x)->id('queue_id');
+    $validation->optional('name','trim');
     $validation->required('type','trim')->like(qr/^[0-9]$/x);
     $validation->optional('settings')->ref('HASH');
     $self->api->utils->error_validation($validation);
@@ -73,7 +73,6 @@ sub update {
     $sql_set->{'name'}     = $validation->param('name')                               if($validation->param('name'));
     $sql_set->{'type'}     = $validation->param('type')                               if($validation->param('type'));
     $sql_set->{'settings'} = [ "?::json", {json => $validation->param('settings') } ] if($validation->param('settings'));
-
 
     my ($sql, @bind) = $self->api->utils->sql->update(
         -table=>'queue',
@@ -92,7 +91,7 @@ sub flush {
     my $validation = $self->validation->input({
         queue_id=>$queue_id,
     });
-    $validation->required('queue_id')->like(qr/^[0-9]+$/x)->id('queue_id');
+    $validation->required('queue_id','gap')->like(qr/^[0-9]+$/x)->id('queue_id');
     $self->api->utils->error_validation($validation);
 
     my ($sql, @bind) = $self->api->utils->sql->update(

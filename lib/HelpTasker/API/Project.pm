@@ -14,8 +14,8 @@ sub create {
         fqdn=>delete $args->{'fqdn'},
         settings=>$args,
     });
-    $validation->required('name');
-    $validation->required('fqdn','trim')->like(qr/^[a-z]{1}[a-z0-9_]+$/x);
+    $validation->required('name','trim');
+    $validation->required('fqdn','gap')->like(qr/^[a-z]{1}[a-z0-9_]+$/x);
     $validation->optional('settings')->ref('HASH');
     $self->api->utils->error_validation($validation);
 
@@ -63,8 +63,8 @@ sub update {
     });
 
     $validation->required('project_id')->like(qr/^[0-9]+$/x)->id('project_id');
-    $validation->optional('name');
-    $validation->optional('fqdn','trim')->like(qr/^[a-z]{1}[a-z0-9_]+$/x);
+    $validation->optional('name','trim');
+    $validation->optional('fqdn','gap')->like(qr/^[a-z]{1}[a-z0-9_]+$/x);
     $validation->optional('settings')->ref('HASH');
     $self->api->utils->error_validation($validation);
 

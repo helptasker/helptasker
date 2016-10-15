@@ -237,6 +237,19 @@ sub validation {
         }
     );
 
+    # FILTERS
+    $self->app->validator->add_filter(lc=>sub{
+        my ($validation, $name, $value) = @_;
+        return lc $value;
+    });
+
+    $self->app->validator->add_filter(gap=>sub{
+        my ($validation, $name, $value) = @_;
+        $value =~ s/\s+//gx;
+        return $value;
+    });
+
+
     return;
 }
 

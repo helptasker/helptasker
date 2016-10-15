@@ -32,4 +32,20 @@ ok($result == 1, 'valid ref HASH in Array');
 $result = $t->app->validator->validation->input({ ref=>$t })->required('ref')->ref('Test::Mojo')->is_valid('ref');
 ok($result == 1, 'valid ref Test::Mojo');
 
+$result = $t->app->validator->validation->input({ string=>' hello ' })->required('string','gap');
+ok($result->param('string') eq 'hello', 'check filter gap');
+
+$result = $t->app->validator->validation->input({ string=>' hel lo ' })->required('string','gap');
+ok($result->param('string') eq 'hello', 'check filter gap (2)');
+
+$result = $t->app->validator->validation->input({ string=>' При вет ' })->required('string','gap');
+ok($result->param('string') eq 'Привет', 'check filter gap (3)');
+
+$result = $t->app->validator->validation->input({ string=>'HELLO' })->required('string','lc');
+ok($result->param('string') eq 'hello', 'check filter lc');
+
+$result = $t->app->validator->validation->input({ string=>'ПРИВЕТ' })->required('string','lc');
+ok($result->param('string') eq 'привет', 'check filter lc (2)');
+
+
 done_testing();

@@ -60,10 +60,25 @@ CREATE TABLE queue (
     settings    JSON      NOT NULL
 );
 
+CREATE TABLE "user" (
+    user_id     SERIAL    PRIMARY KEY,
+    date_create TIMESTAMP with time zone NOT NULL DEFAULT current_timestamp,
+    date_update TIMESTAMP with time zone NOT NULL DEFAULT current_timestamp,
+    lastname    TEXT      NOT NULL,
+    firstname   TEXT      NOT NULL,
+    login       TEXT      UNIQUE NOT NULL,
+    password    TEXT      NOT NULL,
+    email       TEXT      NOT NULL
+);
+
+CREATE INDEX index1 ON "user" (login);
+
+
 -- 1 down
 DROP TABLE IF EXISTS test;
 DROP TABLE IF EXISTS session;
 DROP TABLE IF EXISTS cache;
 DROP TABLE IF EXISTS queue;
 DROP TABLE IF EXISTS project;
+DROP TABLE IF EXISTS "user";
 

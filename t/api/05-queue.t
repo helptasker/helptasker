@@ -43,6 +43,4 @@ my $date_update = $queue->{'date_update'};
 $queue = $t->app->api->queue->flush($queue->{'queue_id'})->get($queue->{'queue_id'})->as_hash;
 ok($date_update ne $queue->{'date_update'}, 'check flush');
 
-
-#say dumper;
 done_testing();
