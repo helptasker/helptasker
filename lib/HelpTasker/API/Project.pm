@@ -71,7 +71,7 @@ sub update {
     my $sql_set = {date_update => ["current_timestamp"]};
     $sql_set->{'name'}     = $validation->param('name')                               if($validation->param('name'));
     $sql_set->{'fqdn'}     = $validation->param('fqdn')                               if($validation->param('fqdn'));
-    $sql_set->{'settings'} = [ "?::json", {json => $validation->param('settings') } ] if($validation->param('settings'));
+    $sql_set->{'settings'} = [ "?::json", {json => $validation->param('settings') } ] if($validation->param('settings') && ref $validation->param('settings') eq 'HASH' && %{$validation->param('settings')});
 
     my ($sql, @bind) = $self->api->utils->sql->update(
         -table=>'project',

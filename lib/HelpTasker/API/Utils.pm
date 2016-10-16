@@ -3,6 +3,7 @@ use Mojo::Base 'HelpTasker::API::Base';
 use Mojo::Util qw(dumper decode);
 use Carp qw(croak confess);
 use SQL::Abstract::More;
+use Data::Pageset;
 
 sub error_tx {
     my ($self, $tx) = @_;
@@ -36,8 +37,63 @@ sub error_validation {
 sub sql {
     my ($self) = @_;
     return SQL::Abstract::More->new();
-;
 }
+
+sub page {
+    my ($self,$total_entries,$args,$cb) = @_;
+
+    my $validation = $self->validation->input({
+        total_entries=>$total_entries,
+        entries_per_page=>delete $args->{'entries_per_page'},
+        current_page=>delete $args->{'current_page'},
+        pages_per_set=>delete $args->{'pages_per_set'},
+        mode=>delete $args->{'mode'},
+    });
+
+    $validation->required('total_entries','gap')->like(qr/^[0-9]+$/x);
+    $validation->optional('entries_per_page','gap')->like(qr/^[0-9]+$/x);
+    $validation->optional('current_page','gap')->like(qr/^[0-9]+$/x);
+    $validation->optional('pages_per_set','gap')->like(qr/^[0-9]+$/x);
+    $validation->optional('mode','gap')->in(qw/fixed slide/);
+    $self->api->utils->error_validation($validation);
+
+    $total_entries       = $validation->param('total_entries');
+    my $entries_per_page = $validation->param('entries_per_page') || 10;
+    my $current_page     = $validation->param('current_page')     || 1;
+    my $pages_per_set    = $validation->param('pages_per_set')    || 7;
+    my $mode             = $validation->param('mode')             || 'slide';
+
+    my $page = Data::Pageset->new({
+        total_entries       => $total_entries,
+        entries_per_page    => $entries_per_page,
+        current_page        => $current_page,
+        pages_per_set       => $pages_per_set,
+        mode                => $mode,
+    });
+
+    my @pages_in_set = ();
+    for my $page (@{$page->pages_in_set()}) {
+        if(ref $cb eq 'CODE'){
+            push(@pages_in_set, $self->$cb($page));
+        }
+        else{
+            push(@pages_in_set, $page);
+        }
+    }
+
+    return {
+        first_page=>$page->first_page,
+        last_page=>$page->last_page,
+        next_page=>$page->next_page,
+        previous_page=>$page->previous_page,
+        previous_set=>$page->previous_set,
+        next_set=>$page->next_set,
+        offset=>$page->skipped,
+        limit=>$page->entries_per_page,
+        pages_in_set=>\@pages_in_set,
+    };
+}
+
 
 1;
 
