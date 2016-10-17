@@ -49,7 +49,7 @@ WriteMakefile(
         'SQL::Abstract::More' => '1.28',
         'Cache::Memcached::Fast' => '0.23',
         'Data::Pageset' => '1.06'
-	},
+    },
     EXE_FILES => ['script/helptasker'],
     test=>{TESTS => 't/*.t t/*/*.t'}
 );
