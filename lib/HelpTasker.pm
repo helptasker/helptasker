@@ -202,7 +202,7 @@ sub type {
 sub validation {
     my ($self) = @_;
 
-    # Проверки сущестрования индификаторов
+    # CHECKS
     $self->app->validator->add_check(
         id => sub {
             my ($c, $field, $value, @args) = @_;
@@ -221,7 +221,7 @@ sub validation {
         }
     );
 
-    # Check email address
+    # Email address
     $self->app->validator->add_check(
         email => sub {
             my ($c, $field, $value, $args) = @_;
@@ -229,7 +229,7 @@ sub validation {
         }
     );
 
-    # Check ref object
+    # Ref object
     $self->app->validator->add_check(
         ref => sub {
             my ($c, $field, $value, $args) = @_;
@@ -246,6 +246,13 @@ sub validation {
     $self->app->validator->add_filter(gap=>sub{
         my ($validation, $name, $value) = @_;
         $value =~ s/\s+//gx;
+        return $value;
+    });
+
+    $self->app->validator->add_filter(oauth_login=>sub{
+        my ($validation, $name, $value) = @_;
+        $value =~ s/\,//gx;
+        $value =~ s/\.//gx;
         return $value;
     });
 

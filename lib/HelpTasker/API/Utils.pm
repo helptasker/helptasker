@@ -42,6 +42,15 @@ sub sql {
 sub page {
     my ($self,$total_entries,$args,$cb) = @_;
 
+    if(ref $total_entries eq 'HASH'){
+        my ($sql, @bind) = $self->api->utils->sql->select(%{$total_entries});
+        my $pg = $self->app->pg->db->query($sql,@bind);
+        $total_entries = $pg->rows;
+    }
+    elsif(ref $total_entries eq 'Mojo::Pg::Results'){
+        $total_entries = $total_entries->rows;
+    }
+
     my $validation = $self->validation->input({
         total_entries=>$total_entries,
         entries_per_page=>delete $args->{'entries_per_page'},
@@ -94,6 +103,17 @@ sub page {
     };
 }
 
+sub stringify {
+    my ($self,$stringify) = @_;
+    my @log = ();
+    $stringify = $stringify->output if(ref $stringify eq 'Mojolicious::Validator::Validation');
+    while(my($k,$v) = each(%{$stringify})){
+        next if(ref $v eq 'HASH');
+        next if(ref $v eq 'ARRAY');
+        push(@log, "$k:$v");
+    }
+    return join(", ",sort { $a cmp $b } @log);
+}
 
 1;
 

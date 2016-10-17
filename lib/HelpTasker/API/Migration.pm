@@ -11,7 +11,7 @@ sub migrate {
 sub clear {
 	my $self = shift;
 	$self->app->pg->migrations->from_data->migrate(0)->migrate;
-	return;
+    return;
 }
 
 1;
@@ -68,11 +68,20 @@ CREATE TABLE "user" (
     firstname   TEXT      NOT NULL,
     login       TEXT      UNIQUE NOT NULL,
     password    TEXT      NOT NULL,
-    email       TEXT      NOT NULL
+    email       TEXT      NOT NULL,
+    settings    JSON      NOT NULL
 );
 
 CREATE INDEX index1 ON "user" (login);
+CREATE INDEX index2 ON "user" (email);
 
+CREATE TABLE user_log (
+    user_log_id SERIAL      PRIMARY KEY,
+    date_create TIMESTAMP with time zone NOT NULL DEFAULT current_timestamp,
+    user_id     INTEGER     REFERENCES "user" ON DELETE CASCADE,
+    code        INTEGER     NOT NULL,
+    args        JSON        NOT NULL
+);
 
 -- 1 down
 DROP TABLE IF EXISTS test;
@@ -80,5 +89,9 @@ DROP TABLE IF EXISTS session;
 DROP TABLE IF EXISTS cache;
 DROP TABLE IF EXISTS queue;
 DROP TABLE IF EXISTS project;
+
+DROP TABLE IF EXISTS user_log;
 DROP TABLE IF EXISTS "user";
+
+
 

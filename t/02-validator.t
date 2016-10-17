@@ -47,5 +47,7 @@ ok($result->param('string') eq 'hello', 'check filter lc');
 $result = $t->app->validator->validation->input({ string=>'ПРИВЕТ' })->required('string','lc');
 ok($result->param('string') eq 'привет', 'check filter lc (2)');
 
+$result = $t->app->validator->validation->input({ login=>'kostya.ten' })->required('login','oauth_login');
+ok($result->param('login') eq 'kostyaten', 'check filter login');
 
 done_testing();

@@ -28,6 +28,7 @@ sub create {
     );
     my $pg = $self->app->pg->db->query($sql,@bind);
     $self->project_id($pg->hash->{'project_id'});
+    $self->app->log->info('project create - project_id:'.$self->project_id.', '.$self->api->utils->stringify($validation));
     return $self;
 }
 
@@ -48,7 +49,8 @@ sub get {
     my $pg = $self->app->pg->db->query($sql,@bind);
     my $result = $pg->expand->hash;
     $self->_result($result);
-    $self->project_id($project_id);
+    $self->project_id($result->{'project_id'});
+    $self->app->log->info('project get - '.$self->api->utils->stringify($result));
     return $self;
 }
 
@@ -69,9 +71,12 @@ sub update {
     $self->api->utils->error_validation($validation);
 
     my $sql_set = {date_update => ["current_timestamp"]};
-    $sql_set->{'name'}     = $validation->param('name')                               if($validation->param('name'));
-    $sql_set->{'fqdn'}     = $validation->param('fqdn')                               if($validation->param('fqdn'));
-    $sql_set->{'settings'} = [ "?::json", {json => $validation->param('settings') } ] if($validation->param('settings') && ref $validation->param('settings') eq 'HASH' && %{$validation->param('settings')});
+    $sql_set->{'name'}     = $validation->param('name') if($validation->param('name'));
+    $sql_set->{'fqdn'}     = $validation->param('fqdn') if($validation->param('fqdn'));
+
+    if($validation->param('settings') && ref $validation->param('settings') eq 'HASH' && %{$validation->param('settings')}){
+        $sql_set->{'settings'} = [ "?::json", {json => $validation->param('settings') } ];
+    }
 
     my ($sql, @bind) = $self->api->utils->sql->update(
         -table=>'project',
@@ -79,8 +84,9 @@ sub update {
         -where=>{project_id=>$validation->param('project_id')}
     );
     $self->app->pg->db->query($sql,@bind);
-    $self->flush($project_id);
-    $self->project_id($project_id);
+    $self->flush($validation->param('project_id'));
+    $self->project_id($validation->param('project_id'));
+    $self->app->log->info('project update - project_id:'.$self->project_id);
     return $self;
 }
 
@@ -99,7 +105,8 @@ sub flush {
         -where=>$validation->output
     );
     $self->app->pg->db->query($sql,@bind);
-    $self->project_id($project_id);
+    $self->project_id($validation->param('project_id'));
+    $self->app->log->info('project flush - project_id:'.$self->project_id);
     return $self;
 }
 
