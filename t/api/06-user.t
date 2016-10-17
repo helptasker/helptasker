@@ -49,4 +49,25 @@ ok($user->{'settings'}->{'int'} == 12345, 'check type int');
 ok($user->{'settings'}->{'unicode'} eq "\x{20AC}", 'check type unicode');
 ok($user->{'settings'}->{'hash'}->{'test'} == 1, 'check type hash');
 
+note('search login');
+$user = $t->app->api->user->search('kostya');
+
+$user = $user->as_hash;
+like($user->{'result'}->[0]->{'date_create'}, qr/[0-9]{4}-[0-9]{2}-[0-9]{2}\s[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]+\+[0-9]+/, 'date_create');
+like($user->{'result'}->[0]->{'date_update'}, qr/[0-9]{4}-[0-9]{2}-[0-9]{2}\s[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]+\+[0-9]+/, 'date_update');
+ok($user->{'result'}->[0]->{'email'} eq 'devnull@yandex.ru', 'email');
+ok($user->{'result'}->[0]->{'lastname'} eq 'Ten', 'lastname');
+ok($user->{'result'}->[0]->{'firstname'} eq 'Kostya', 'firstname');
+ok($user->{'result'}->[0]->{'login'} eq 'kostya', 'login');
+like($user->{'result'}->[0]->{'password'},qr/[0-9a-z]{40}/, 'password');
+ok($user->{'result'}->[0]->{'user_id'} == 1, 'user_id');
+ok(ref $user->{'result'}->[0]->{'settings'} eq 'HASH', 'settings');
+
+ok($user->{'page'}->{'first_page'} == 1, 'page first_page');
+ok($user->{'page'}->{'last_page'} == 1, 'page last_page');
+ok($user->{'page'}->{'limit'} == 10, 'page limit');
+ok($user->{'page'}->{'offset'} eq 0, 'page offset');
+
+#say dumper $user;
+
 done_testing();
