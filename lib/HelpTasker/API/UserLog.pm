@@ -33,6 +33,7 @@ sub add {
         -values=>$validation->output,
         -returning=>'user_log_id',
     );
+
     my $pg = $self->app->pg->db->query($sql,@bind);
     croak qq/Write error sql/ if($pg->rows != 1);
     return $self;

@@ -5,8 +5,6 @@ use Carp qw(croak);
 use Data::Random qw(rand_chars);
 use overload bool => sub {1}, '""' => sub {shift->user_id }, fallback => 1;
 
-# User Log code between (1-50)
-
 has [qw(user_id _result)];
 
 sub create {
