@@ -20,7 +20,7 @@ sub create {
     $validation->required('lastname','trim');
     $validation->required('firstname','trim');
     $validation->required('login','gap','lc')->size(4,20)->like(qr/^[a-z]{1}[a-z0-9]+[\-\_]?[a-z0-9]+$/x);
-    $validation->optional('password','trin')->size(6,50);
+    $validation->optional('password','trim')->size(6,50);
     $validation->required('email','gap','lc')->email({mxcheck=>1, tldcheck=>1});
     $validation->optional('settings')->ref('HASH');
     $self->api->utils->error_validation($validation);
@@ -39,6 +39,27 @@ sub create {
 
     $self->api->userlog->add(1,$self->user_id,$validation);
     $self->app->log->info('create user - user_id:'.$self->user_id.', '.$self->api->utils->stringify($validation));
+    return $self;
+}
+
+sub get {
+    my ($self,$user_id) = @_;
+    my $validation = $self->validation->input({
+        user_id=>$user_id,
+    });
+    $validation->required('user_id')->like(qr/^[0-9]+$/x)->id('user_id');
+    $self->api->utils->error_validation($validation);
+
+    my ($sql, @bind) = $self->api->utils->sql->select(
+        -columns=>[qw/user_id date_create date_update lastname firstname login password email settings/],
+        -from=>'"user"',
+        -where=>$validation->output,
+    );
+    my $pg = $self->pg->db->query($sql,@bind);
+    my $result = $pg->expand->hash;
+    $self->_result($result);
+    $self->user_id($result->{'user_id'});
+    $self->app->log->info('user get - '.$self->api->utils->stringify($result));
     return $self;
 }
 
@@ -63,7 +84,7 @@ sub search {
     $self->api->utils->error_validation($validation);
 
     $query = {
-        -columns=>'*',
+        -columns=>[qw/user_id date_create date_update lastname firstname login password email settings/],
         -from=>'"user"',
         -order_by=>[qw/-user_id/],
         -where=>$validation->output,
