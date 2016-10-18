@@ -28,7 +28,6 @@ sub error_validation {
     for my $field (@{$validation->failed}) {
         my ($check, $result, @args) = @{$validation->error($field)};
         my ($pkg, $line) = (caller())[0, 2];
-        #($pkg, $line) = (caller(1))[0, 2] if $pkg eq ref $self;
         croak qq/invalid param field:$field, check:$check, package $pkg\[$line\]/;
     }
     return;

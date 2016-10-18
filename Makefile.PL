@@ -48,7 +48,8 @@ WriteMakefile(
         'Mojo::ACME' => '0.07',
         'SQL::Abstract::More' => '1.28',
         'Cache::Memcached::Fast' => '0.23',
-        'Data::Pageset' => '1.06'
+        'Data::Pageset' => '1.06',
+        'GeoIP2' => '2.003001',
     },
     EXE_FILES => ['script/helptasker'],
     test=>{TESTS => 't/*.t t/*/*.t'}

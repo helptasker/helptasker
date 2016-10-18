@@ -42,6 +42,34 @@ sub create {
     return $self;
 }
 
+#sub update {
+#    my ($self,$user_id,$args) = @_;
+#    my $validation = $self->validation->input({
+#        user_id=>$user_id,
+#        lastname=>delete $args->{'lastname'},
+#        firstname=>delete $args->{'firstname'},
+#        email=>delete $args->{'email'},
+#        password=>delete $args->{'password'},
+#        settings=>$args,
+#    });
+
+#    $validation->required('lastname','trim');
+#    $validation->required('firstname','trim');
+#    $validation->optional('password','trim')->size(6,50);
+#    $validation->required('email','gap','lc')->email({mxcheck=>1, tldcheck=>1});
+#    $validation->optional('settings')->ref('HASH');
+#    $self->api->utils->error_validation($validation);
+
+#    my $sql_set = {date_update => ["current_timestamp"]};
+
+#    my ($sql, @bind) = $self->api->utils->sql->update(
+#        -table=>'"user"',
+#        -set=>$sql_set,
+#        -where=>{user_id=>$validation->param('user_id')}
+#    );
+#    return;
+#}
+
 sub get {
     my ($self,$user_id) = @_;
     my $validation = $self->validation->input({

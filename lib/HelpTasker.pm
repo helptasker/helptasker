@@ -40,7 +40,6 @@ sub route {
     $r->any('/api/:version/:action/:param'=>[version => ['v1'], method=>qr/[a-z]{1}[0-9a-z]+/ix, param=>qr/[a-z0-9\;]/x])->to(controller => 'API');
     $r->get('/doc/')->to(controller => 'Doc', action=>'main');
     $r->get('/doc/:module')->to(controller => 'Doc', action=>'main');
-
     return $r;
 }
 
@@ -60,6 +59,8 @@ sub default_config {
         api_email_mime_template_section=>'auto_template',
         api_email_mime_encode=>'base64',
         api_cache_module=>'HelpTasker::API::Cache::DB',
+        api_geo_module=>'HelpTasker::API::GeoIP::MaxMind',
+        api_geo_module_maxmind_base_dir=>'/var/tmp/maxmind/',
     };
 
     if (defined $ENV{'TRAVIS'}) {
@@ -89,7 +90,9 @@ sub helpers {
     $self->plugin('ACME');
 
     for my $module (find_modules 'HelpTasker::API') {
-        next if($module eq 'HelpTasker::API::Cache');
+        next if($module eq 'HelpTasker::API::GeoIP');
+        #next if($module eq 'HelpTasker::API::Cache');
+        
 
         my $e = load_class $module;
         carp qq{Loading "$module" failed: $e} and next if ref $e;
@@ -102,11 +105,21 @@ sub helpers {
         }
     }
 
-    # Loader modile cache
+    # Loader module cache
     if(my $module = $self->app->config('api_cache_module')){
         my $e = load_class $module;
         carp qq{Loading "$module" failed: $e} and next if ref $e;
         $self->helper('api.cache' => sub {
+            my $c   = shift;
+            return $module->new(app=>$c->app);
+        });
+    }
+
+    # Loader module geo
+    if(my $module = $self->app->config('api_geo_module')){
+        my $e = load_class $module;
+        carp qq{Loading "$module" failed: $e} and next if ref $e;
+        $self->helper('api.geoip' => sub {
             my $c   = shift;
             return $module->new(app=>$c->app);
         });
