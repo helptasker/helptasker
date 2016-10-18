@@ -5,6 +5,7 @@ use Carp qw(croak);
 
 sub address {
     my $self = shift;
+    return;
 }
 
 1;
