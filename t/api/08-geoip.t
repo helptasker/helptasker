@@ -11,7 +11,7 @@ my $t = Test::Mojo->new('HelpTasker');
 $t->app->api->migration->clear; # reset db
 
 SKIP: {
-    skip 'Skip travis', 6 if defined $ENV{'TRAVIS'} && $ENV{'TRAVIS'} == 'true';
+    skip 'Skip travis', 6 if defined $ENV{'TRAVIS'} && $ENV{'TRAVIS'} eq 'true';
     my $location = $t->app->api->geoip->ip('2a02:6b8::feed:0ff');
     ok($location->{'iso_code'} eq 'RU', 'iso_code');
     ok($location->{'latitude'} eq '55.7522', 'latitude');
