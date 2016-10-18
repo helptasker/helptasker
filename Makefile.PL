@@ -27,7 +27,7 @@ WriteMakefile(
         },
     },
     PREREQ_PM    => {
-        'Mojolicious' => '7.06',
+        'Mojolicious' => '7.08',
         'DBI' => '1.631',
         'Mojo::Pg' => '2.30',
         'EV' => '4.22',
@@ -39,7 +39,7 @@ WriteMakefile(
         'Data::Random' => '0.12',
         'File::Type' => '0.22',
         'Net::SMTP_auth' => '0.08',
-        'Email::Valid' => '1.200',
+        'Email::Valid' => '1.202',
         'Net::Domain::TLD' => '1.74',
         'Text::Iconv' => '1.7',
         'Net::IP' => '1.26',
@@ -50,6 +50,7 @@ WriteMakefile(
         'Cache::Memcached::Fast' => '0.23',
         'Data::Pageset' => '1.06',
         'GeoIP2' => '2.003001',
+        'Locale::Maketext' => '1.28',
     },
     EXE_FILES => ['script/helptasker'],
     test=>{TESTS => 't/*.t t/*/*.t'}

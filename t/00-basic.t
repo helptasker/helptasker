@@ -13,24 +13,8 @@ ok(ref $t eq 'Test::Mojo', 'check object');
 my $version = $t->app->pg->db->query('select version() as version')->hash->{version};
 like($version, qr/^PostgreSQL\s9/, 'check PostgreSQL version');
 
-#my $pg = $t->app->pg;
-
-# Use migrations to create a table
-#$pg->migrations->name('my_names_app')->from_string(<<EOF)->migrate;
-#-- 1 up
-#create table names (id serial primary key, name text);
-#-- 1 down
-#drop table names;
-#EOF
- 
-# Use migrations to drop and recreate the table
-#$pg->migrations->migrate(0)->migrate;
-
-
-# Insert a few rows
-#my $db = $pg->db;
-#$db->query('insert into names (name) values (?)', 'Sara');
-#$db->query('insert into names (name) values (?)', 'Stefan');
+note('i18n');
+ok($t->app->l('test', 'Тест 2') eq 'Тест Тест 2', 'ok i18n');
 
 done_testing();
 

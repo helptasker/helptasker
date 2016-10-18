@@ -1,11 +1,12 @@
 package HelpTasker;
 use Mojo::Base 'Mojolicious';
-use Mojo::Util qw(dumper);
+use Mojo::Util qw(dumper decode);
 use Mojo::Loader qw(find_modules load_class);
 use Mojo::Pg;
 use Carp;
 use Try::Tiny;
 use Time::HiRes();
+use HelpTasker::API::I18N;
 
 sub startup {
     my $self = shift;
@@ -91,8 +92,7 @@ sub helpers {
 
     for my $module (find_modules 'HelpTasker::API') {
         next if($module eq 'HelpTasker::API::GeoIP');
-        #next if($module eq 'HelpTasker::API::Cache');
-        
+        next if($module eq 'HelpTasker::API::I18N');
 
         my $e = load_class $module;
         carp qq{Loading "$module" failed: $e} and next if ref $e;
@@ -124,6 +124,12 @@ sub helpers {
             return $module->new(app=>$c->app);
         });
     }
+
+    $self->helper(l => sub {
+        my ($c, $text, @args) = @_;
+        my $lh = HelpTasker::API::I18N->get_handle('ru'); # FIXME autodetect lang
+        return $lh->maketext($text,@args);
+    });
 
     $self->helper('reply.api' => sub {
         my ($c, $json, $param) = @_;
