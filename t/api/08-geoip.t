@@ -10,12 +10,18 @@ $ENV{'MOJO_TEST'} = 1;
 my $t = Test::Mojo->new('HelpTasker');
 $t->app->api->migration->clear; # reset db
 
-#say dumper $t->app->api->geoip->address;
+SKIP: {
+    skip 'Skip travis', 6 if defined $ENV{'TRAVIS'} && $ENV{'TRAVIS'} == 'true';
+    my $location = $t->app->api->geoip->ip('2a02:6b8::feed:0ff');
+    ok($location->{'iso_code'} eq 'RU', 'iso_code');
+    ok($location->{'latitude'} eq '55.7522', 'latitude');
+    ok($location->{'longitude'} eq '37.6156', 'longitude');
 
-my $command = HelpTasker::command::maxmind->new(app=>$t->app);
-$command->run();
+    $location = $t->app->api->geoip->ip('8.8.8.8');
+    ok($location->{'iso_code'} eq 'US', 'iso_code');
+    ok($location->{'latitude'} eq '37.386', 'latitude');
+    ok($location->{'longitude'} eq '-122.0838', 'longitude');
 
+};
 
-
-ok(1==1);
 done_testing();

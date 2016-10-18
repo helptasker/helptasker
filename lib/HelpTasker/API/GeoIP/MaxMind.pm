@@ -10,8 +10,20 @@ use overload bool => sub {1}, fallback => 1;
 
 sub ip {
     my ($self,$ip) = @_;
-    #my $reader = GeoIP2::Database::Reader->new(file=>'/path/to/database', locales => [ 'en' ]);
-    return;
+    my $validation = $self->validation->input({
+        ip=>$ip,
+    });
+    $validation->required('ip','gap','lc');
+    $self->api->utils->error_validation($validation);
+
+    my $file = Mojo::Path->new($self->app->config('api_geo_module_maxmind_base_dir').'/GeoLite2-City.mmdb')->canonicalize;
+    croak qq/Permission denied $file/ if(!-r $file);
+
+    my $reader = GeoIP2::Database::Reader->new(file=>$file, locales => [ 'en' ]);
+    my $city = $reader->city( ip => $validation->param('ip') );
+    my $location = $city->location;
+    my $iso_code = $city->country->iso_code;
+    return {latitude=>$location->latitude, longitude=>$location->longitude, iso_code=>$iso_code};
 }
 
 1;

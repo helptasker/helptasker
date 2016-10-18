@@ -3,8 +3,8 @@ use Mojo::Base 'HelpTasker::API::Base';
 use Mojo::Util qw(dumper);
 use Carp qw(croak);
 
-sub address {
-    my $self = shift;
+sub location {
+    my ($self, $latitude, $longitude) = @_;
     return;
 }
 
