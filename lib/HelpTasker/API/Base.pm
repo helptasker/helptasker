@@ -7,6 +7,11 @@ sub app {
     return $self->{'app'};
 }
 
+sub l {
+    my $self = shift;
+    return $self->app->l;
+}
+
 sub pg {
     my $self = shift;
     return $self->app->pg;

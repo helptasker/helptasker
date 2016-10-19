@@ -23,6 +23,7 @@ our %Lexicon = (
     'Re-type Your Password' => 'Повторите пароль',
     'Submit' => 'Отправить',
     'Back' => 'Назад',
+    'Field is not filled' => 'Не заполнено поле',
 
 );
 
