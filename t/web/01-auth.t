@@ -13,10 +13,12 @@ $t->get_ok('/auth/');
 $t->status_is(200);
 #$->text_is('div#message' => 'Hello!');
 
+say dumper $t->ua;
 
 $t->get_ok('/auth/registration/');
 $t->status_is(200);
 
+#say dumper $t->tx->res->body;
 
 ok(1==1);
 

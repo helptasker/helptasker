@@ -211,22 +211,29 @@ sub hooks {
         #$self->app->log->info('Accept Language ' . $c->req->headers->accept_language);
 
         # Detect language header Accept-Language
-        if(my $accept_language = $c->req->headers->accept_language){
-            my @languages = I18N::LangTags::implicate_supers(I18N::LangTags::Detect->http_accept_langs($accept_language));
-            if(@languages){
-                $c->stash(i18n_language => shift @languages);
+        if(my $language = $c->req->cookie('language')){
+            $c->stash(i18n_language => $language->value);
+        }
+        else{
+            if(my $accept_language = $c->req->headers->accept_language){
+                my @languages = I18N::LangTags::implicate_supers(I18N::LangTags::Detect->http_accept_langs($accept_language));
+                if(@languages){
+                    $c->stash(i18n_language => shift @languages);
+                }
+                else{
+                    $c->stash(i18n_language => $self->app->config('i18n_default_language'));
+                }
             }
             else{
                 $c->stash(i18n_language => $self->app->config('i18n_default_language'));
             }
-        }
-        else{
-            $c->stash(i18n_language => $self->app->config('i18n_default_language'));
+            $c->res->cookies({name => 'language', value => $self->app->config('i18n_default_language'), path=>'/', max_age=>60*60*24*365});
         }
 
         # Params lang=en
         if(my $lang = $c->req->params->param('lang')){
             $c->stash(i18n_language => $lang);
+            $c->res->cookies({name => 'language', value => $lang, path=>'/', max_age=>60*60*24*365});
         }
 
     });
