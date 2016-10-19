@@ -1,0 +1,30 @@
+: cascade layouts::auth { title => $c.l('Sign In') }
+
+: around content -> {
+<!-- BEGIN LOGIN FORM -->
+<form action="/auth/" method="post">
+    <: $c.csrf_field | raw :>
+    <h3 class="form-title font-green"><: $c.l('Sign In') :></h3>
+    <!--
+    <div class="alert alert-danger">
+        <span> Enter any username and password. </span>
+    </div>
+    -->
+    <div class="form-group">
+        <label class="control-label visible-ie8 visible-ie9"><: $c.l('Username') :></label>
+        <input class="form-control form-control-solid placeholder-no-fix" type="text" autocomplete="off" placeholder="<: $c.l('Username') :>" name="username" /> 
+    </div>
+    <div class="form-group">
+        <label class="control-label visible-ie8 visible-ie9"><: $c.l('Password') :></label>
+        <input class="form-control form-control-solid placeholder-no-fix" type="password" autocomplete="off" placeholder="<: $c.l('Password') :>" name="password" /> 
+    </div>
+    <div class="form-actions">
+        <button type="submit" class="btn green uppercase"><: $c.l('Log In') :></button>
+        <a href="/auth/forgot_password/" class="forget-password"><: $c.l('Forgot Password?') :></a>
+    </div>
+    <div class="create-account">
+        <p><a href="/auth/registration/" class="uppercase"><: $c.l('Create an account') :></a></p>
+    </div>
+</form>
+<!-- END LOGIN FORM -->
+: }

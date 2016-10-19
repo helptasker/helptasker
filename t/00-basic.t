@@ -14,7 +14,7 @@ my $version = $t->app->pg->db->query('select version() as version')->hash->{vers
 like($version, qr/^PostgreSQL\s9/, 'check PostgreSQL version');
 
 note('i18n');
-ok($t->app->l('test', 'Тест 2') eq 'Тест Тест 2', 'ok i18n');
+ok($t->app->l('Registration') eq 'Registration', 'ok i18n');
 
 done_testing();
 

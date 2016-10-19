@@ -9,8 +9,8 @@ use Email::Address;
 
 sub validator {
     my ($self,$address,$param) = @_;
-    my $mxcheck  = $param->{'mxcheck'} || 0;
-    my $tldcheck = $param->{'tldcheck'} || 0;
+    my $mxcheck  = $param->{'mxcheck'} || undef;
+    my $tldcheck = $param->{'tldcheck'} || undef;
     return Email::Valid->address(-address => $address, -mxcheck=>$mxcheck, -tldcheck=>$tldcheck) ? true : false
 }
 

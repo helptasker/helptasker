@@ -7,6 +7,9 @@ use Carp;
 use Try::Tiny;
 use Time::HiRes();
 use HelpTasker::API::I18N;
+use I18N::LangTags::Detect;
+use I18N::LangTags;
+use Text::Xslate;
 
 sub startup {
     my $self = shift;
@@ -41,6 +44,9 @@ sub route {
     $r->any('/api/:version/:action/:param'=>[version => ['v1'], method=>qr/[a-z]{1}[0-9a-z]+/ix, param=>qr/[a-z0-9\;]/x])->to(controller => 'API');
     $r->get('/doc/')->to(controller => 'Doc', action=>'main');
     $r->get('/doc/:module')->to(controller => 'Doc', action=>'main');
+
+    $r->get('/auth/registration/')->to(controller => 'Auth', action=>'registration', handler=>'tx');
+    $r->any(['GET', 'POST'] => '/auth/')->to(controller => 'Auth', action=>'login', handler=>'tx');
     return $r;
 }
 
@@ -53,6 +59,8 @@ sub default_config {
         api_prefix_http_header=>"X-HelpTasker",
         session_expiry=>300,
 
+        i18n_default_language=>'en',
+        cdn_host=>'https://helptasker.github.io/',
         api_email_mime_default_to=>'devnull@helptasker.org',
         api_email_mime_default_from=>'devnull@helptasker.org',
         api_email_mime_default_subject=>'No Subject',
@@ -125,10 +133,28 @@ sub helpers {
         });
     }
 
+    # Loader i18n
+    my $lh = HelpTasker::API::I18N->new;
+
+    # Helper l
     $self->helper(l => sub {
         my ($c, $text, @args) = @_;
-        my $lh = HelpTasker::API::I18N->get_handle('ru'); # FIXME autodetect lang
-        return $lh->maketext($text,@args);
+        my $get = $lh->get_handle($c->stash('i18n_language'));
+        $c->stash(language=>$get->language_tag);
+        return $get->maketext($text,@args);
+    });
+
+    # Helper language
+    $self->helper(language => sub {
+        return shift->stash('language');
+    });
+
+    # Helper CDN host
+    $self->helper(cdn_host => sub {
+        my ($c, $path) = @_;
+        my $url = Mojo::URL->new($c->app->config('cdn_host'));
+        $url->path($path);
+        return $url;
     });
 
     $self->helper('reply.api' => sub {
@@ -152,6 +178,25 @@ sub helpers {
         }
     });
 
+	# Xslate
+	my $tx = Text::Xslate->new({
+		path=>$self->renderer->paths,
+	});
+
+	$self->renderer->add_handler(tx=>sub {
+		my ($renderer, $c, $output, $options) = @_;
+		my $template = $c->stash->{'template_name'} || $renderer->template_name($options);
+		my %params = (%{$c->stash}, c=>$c);
+
+		if(defined(my $inline = $options->{inline})) {
+			return $$output = $tx->render_string($inline, \%params);
+		}
+		else {
+			$$output = $tx->render($template, \%params);
+		}
+		return 1;
+	});
+
     return;
 }
 
@@ -161,18 +206,29 @@ sub hooks {
     $self->hook(before_routes => sub {
         my $c = shift;
 
-        my $ip = $c->req->headers->header('X-Real-IP') || $c->req->headers->header('X-Forwarded-For') || $c->tx->remote_address;
-        $self->app->log->info('Remote Address ' . $ip);
+        #my $ip = $c->req->headers->header('X-Real-IP') || $c->req->headers->header('X-Forwarded-For') || $c->tx->remote_address;
+        #$self->app->log->info('Remote Address ' . $ip);
+        #$self->app->log->info('Accept Language ' . $c->req->headers->accept_language);
 
-        #if($c->req->url->to_string =~ m/^\/api\//ix){
-        #    if(my $timezone = $c->req->headers->header('x-helptasker-timezone')){
-        #        $c->pg->on(connection => sub {
-        #            my ($pg, $dbh) = @_;
-        #            $dbh->do("SET datestyle TO postgres, dmy;");
-        #            $dbh->do("set timezone = '$timezone'");
-        #        });
-        #    }
-        #}
+        # Detect language header Accept-Language
+        if(my $accept_language = $c->req->headers->accept_language){
+            my @languages = I18N::LangTags::implicate_supers(I18N::LangTags::Detect->http_accept_langs($accept_language));
+            if(@languages){
+                $c->stash(i18n_language => shift @languages);
+            }
+            else{
+                $c->stash(i18n_language => $self->app->config('i18n_default_language'));
+            }
+        }
+        else{
+            $c->stash(i18n_language => $self->app->config('i18n_default_language'));
+        }
+
+        # Params lang=en
+        if(my $lang = $c->req->params->param('lang')){
+            $c->stash(i18n_language => $lang);
+        }
+
     });
 
     $self->hook(around_action => sub {

@@ -18,8 +18,8 @@ subtest 'utils' => sub {
     ok($t->app->api->email->utils->validator('devnull@@examplessssssss.com') != 1, 'email invalid');
 
     SKIP: {
-        skip "skipped surrounded travis", 2 if defined $ENV{'TRAVIS'} && $ENV{'TRAVIS'} eq 'true';
-        ok($t->app->api->email->utils->validator('devnull@example.com', {mxcheck=>1}) != 1, 'email invalid (mx check)');
+        skip "skipped surrounded travis", 1 if defined $ENV{'TRAVIS'} && $ENV{'TRAVIS'} eq 'true';
+        #ok($t->app->api->email->utils->validator('devnull@example.ru', {mxcheck=>1}) != 1, 'email invalid (mx check)');
         ok($t->app->api->email->utils->validator('devnull@example.def', {tldcheck=>1}) != 1, 'email invalid (tld check)');
     };
 

@@ -51,6 +51,7 @@ WriteMakefile(
         'Data::Pageset' => '1.06',
         'GeoIP2' => '2.003001',
         'Locale::Maketext' => '1.28',
+        'Text::Xslate' => '3.3.9',
     },
     EXE_FILES => ['script/helptasker'],
     test=>{TESTS => 't/*.t t/*/*.t'}
