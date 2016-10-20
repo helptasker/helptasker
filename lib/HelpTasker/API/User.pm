@@ -19,7 +19,7 @@ sub create {
     });
     $validation->required('lastname','trim');
     $validation->required('firstname','trim');
-    $validation->required('login','gap','lc')->size(4,20)->like(qr/^[a-z]{1}[a-z0-9]+[\-\_]?[a-z0-9]+$/x);
+    $validation->required('login','gap','lc')->size(4,50)->like(qr/^[a-z]{1}[a-z0-9]+[\-\_]?[a-z0-9]+$/x);
     $validation->optional('password','trim')->size(6,50);
     $validation->required('email','gap','lc')->email({mxcheck=>1, tldcheck=>1});
     $validation->optional('settings')->ref('HASH');

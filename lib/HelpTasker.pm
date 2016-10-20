@@ -33,6 +33,8 @@ sub init {
     $self->validation;
     #say dumper $self->config;
 
+    #$self->app->api->migration->clear;
+
     return;
 }
 

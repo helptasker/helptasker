@@ -24,7 +24,7 @@ our %Lexicon = (
     'Submit' => 'Отправить',
     'Back' => 'Назад',
     'Field is not filled' => 'Не заполнено поле',
-
+    'Incorrect username or password' => 'Неверный пользователь или пароль',
 );
 
 1;

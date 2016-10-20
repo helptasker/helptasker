@@ -21,19 +21,21 @@ $t->status_is(200);
 $t->text_is('div[class="alert alert-danger"] > span' => 'Field is not filled «Username»' , 'Field is not filled «Username»');
 $t->reset_session;
 
-$t->post_ok('/auth/'=>form => {lang=>'ru'});
-$t->status_is(200);
-$t->text_is('div[class="alert alert-danger"] > span' => 'Не заполнено поле «Пользователь»' , 'Не заполнено поле «Пользователь»');
-$t->reset_session;
-
 $t->post_ok('/auth/'=>form => {login=>12345});
 $t->status_is(200);
 $t->text_is('div[class="alert alert-danger"] > span' => 'Field is not filled «Password»' , 'Field is not filled «Password»');
 $t->reset_session;
 
-$t->post_ok('/auth/'=>form => {lang=>'ru', login=>12345});
+$t->post_ok('/auth/'=>form => {password=>12345});
 $t->status_is(200);
-$t->text_is('div[class="alert alert-danger"] > span' => 'Не заполнено поле «Пароль»' , 'Не заполнено поле «Пароль»');
+$t->text_is('div[class="alert alert-danger"] > span' => 'Field is not filled «Username»' , 'Field is not filled «Username»');
+$t->reset_session;
+
+# Create user
+$t->app->api->user->create('kazerogova', {firstname=>'Kazerogova', lastname=>'Lilu', password=>"123456789", email=>'kazergova@example.com'});
+$t->post_ok('/auth/'=>form => {login=>"kazerogova", password=>"1234567890"});
+$t->status_is(200);
+$t->text_is('div[class="alert alert-danger"] > span' => 'Incorrect username or password' , 'Incorrect username or password');
 $t->reset_session;
 
 
