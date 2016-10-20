@@ -139,9 +139,16 @@ sub helpers {
     # Helper l
     $self->helper(l => sub {
         my ($c, $text, @args) = @_;
-        my $get = $lh->get_handle($c->stash('i18n_language'));
-        $c->stash(language=>$get->language_tag);
-        return $get->maketext($text,@args);
+        if(defined $text && $text){
+            my $get = $lh->get_handle($c->stash('i18n_language'));
+            $c->stash(language=>$get->language_tag);
+            return $get->maketext($text,@args);
+        }
+        else{
+            my $get = $lh->get_handle($c->stash('i18n_language'));
+            $c->stash(language=>$get->language_tag);
+            return $get->language_tag;
+        }
     });
 
     # Helper language
@@ -220,14 +227,14 @@ sub hooks {
                 if(@languages){
                     $c->stash(i18n_language => shift @languages);
                 }
-                else{
+                else {
                     $c->stash(i18n_language => $self->app->config('i18n_default_language'));
                 }
             }
-            else{
+            else {
                 $c->stash(i18n_language => $self->app->config('i18n_default_language'));
             }
-            $c->res->cookies({name => 'language', value => $self->app->config('i18n_default_language'), path=>'/', max_age=>60*60*24*365});
+            $c->res->cookies({name => 'language', value => $c->stash('i18n_language'), path=>'/', max_age=>60*60*24*365});
         }
 
         # Params lang=en
@@ -284,7 +291,6 @@ sub type {
 sub validation {
     my ($self) = @_;
 
-    # CHECKS
     $self->app->validator->add_check(
         id => sub {
             my ($c, $field, $value, @args) = @_;
@@ -309,6 +315,18 @@ sub validation {
         }
     );
 
+    $self->app->validator->add_check(
+        exist => sub {
+            my ($c, $field, $value, $args) = @_;
+            if(defined $field && $field eq 'login' && defined $value && $value){
+                my ($sql, @bind) = $self->api->utils->sql->select(-columns=>[qw/user_id/], -from=>'"user"', -where=>{login=>$value});
+                my $pg = $self->app->pg->db->query($sql,@bind);
+                my $rows = $pg->rows;
+                return defined $rows && $rows ? undef : 1;
+            }
+        }
+    );
+
     # Email address
     $self->app->validator->add_check(
         email => sub {
@@ -316,6 +334,8 @@ sub validation {
             return $self->app->api->email->utils->validator($value,$args) ? undef : 1;
         }
     );
+
+
 
     # Ref object
     $self->app->validator->add_check(

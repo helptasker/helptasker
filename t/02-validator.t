@@ -50,4 +50,13 @@ ok($result->param('string') eq 'привет', 'check filter lc (2)');
 $result = $t->app->validator->validation->input({ login=>'kostya.ten' })->required('login','oauth_login');
 ok($result->param('login') eq 'kostyaten', 'check filter login');
 
+note('Validator check exist');
+$result = $t->app->api->user->create('kazerogova', {firstname=>'Kazerogova', lastname=>'Lilu', email=>'kazergova@example.com'});
+
+$result = $t->app->validator->validation->input({ login=>'kostya.ten' })->required('login')->exist('login');
+ok($result->has_error('login') == 1, 'invalid login');
+
+$result = $t->app->validator->validation->input({ login=>'kazerogova' })->required('login')->exist('login');
+ok($result->has_error('login') != 1, 'valid login');
+
 done_testing();
