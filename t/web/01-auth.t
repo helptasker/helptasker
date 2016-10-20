@@ -16,24 +16,28 @@ $t->status_is(200);
 $t->get_ok('/auth/registration/');
 $t->status_is(200);
 
-$t->post_ok('/auth/'=>form => {});
+my $csrf_token = $t->ua->get('/auth/')->res->dom->at('[name=csrf_token]')->{'value'};
+$t->post_ok('/auth/'=>form => {csrf_token=>$csrf_token});
 $t->status_is(200);
 $t->text_is('div[class="alert alert-danger"] > span' => 'Field is not filled «Username»' , 'Field is not filled «Username»');
 $t->reset_session;
 
-$t->post_ok('/auth/'=>form => {login=>12345});
+$csrf_token = $t->ua->get('/auth/')->res->dom->at('[name=csrf_token]')->{'value'};
+$t->post_ok('/auth/'=>form => {csrf_token=>$csrf_token, login=>12345});
 $t->status_is(200);
 $t->text_is('div[class="alert alert-danger"] > span' => 'Field is not filled «Password»' , 'Field is not filled «Password»');
 $t->reset_session;
 
-$t->post_ok('/auth/'=>form => {password=>12345});
+$csrf_token = $t->ua->get('/auth/')->res->dom->at('[name=csrf_token]')->{'value'};
+$t->post_ok('/auth/'=>form => {csrf_token=>$csrf_token, password=>12345});
 $t->status_is(200);
 $t->text_is('div[class="alert alert-danger"] > span' => 'Field is not filled «Username»' , 'Field is not filled «Username»');
 $t->reset_session;
 
 # Create user
+$csrf_token = $t->ua->get('/auth/')->res->dom->at('[name=csrf_token]')->{'value'};
 $t->app->api->user->create('kazerogova', {firstname=>'Kazerogova', lastname=>'Lilu', password=>"123456789", email=>'kazergova@example.com'});
-$t->post_ok('/auth/'=>form => {login=>"kazerogova", password=>"1234567890"});
+$t->post_ok('/auth/'=>form => {csrf_token=>$csrf_token, login=>"kazerogova", password=>"1234567890"});
 $t->status_is(200);
 $t->text_is('div[class="alert alert-danger"] > span' => 'Incorrect username or password' , 'Incorrect username or password');
 $t->reset_session;

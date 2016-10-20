@@ -6,6 +6,7 @@ sub login {
     my $self = shift;
     return $self->render() if($self->req->method eq 'GET');
 
+	return $self->redirect_to('/') if($self->validation->csrf_protect->has_error('csrf_token'));
     $self->validation->required('login','gap','lc')->exist('login');
     $self->validation->required('password','trim');
     my @error = ();
