@@ -49,6 +49,8 @@ sub route {
 
     $r->any(['GET', 'POST'] => '/auth/')->to(controller => 'Auth', action=>'login', handler=>'tx');
     $r->any(['GET', 'POST'] => '/auth/registration/')->to(controller => 'Auth', action=>'registration', handler=>'tx');
+    $r->any(['GET'] => '/manifest.json')->to(controller => 'Manifest', action=>'manifest');
+
     return $r;
 }
 

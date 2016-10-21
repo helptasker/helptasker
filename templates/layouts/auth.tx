@@ -16,6 +16,7 @@
         <meta content="width=device-width, initial-scale=1" name="viewport" />
         <meta content="Kostya Ten (kostya@yandex.ru)" name="author" />
         <meta name="theme-color" content="#8290a3" />
+        <link rel="manifest" href="/manifest.json">
 
         <!-- BEGIN GLOBAL MANDATORY STYLES -->
         <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700&subset=all" rel="stylesheet" type="text/css" />

@@ -13,7 +13,7 @@ sub login {
     my @error = ();
     for my $field (@{$self->validation->failed}){
         my ($check, $result, @args) = @{$self->validation->error($field)};
-        push(@error, {sorting=>1, msg=>$self->l('Field is not filled').' «'.$self->l('Username').'»'}) if($field eq 'login' && $check eq 'required');
+        push(@error, {sorting=>1, msg=>$self->l('Field is not filled').' «'.$self->l('Login').'»'}) if($field eq 'login' && $check eq 'required');
         push(@error, {sorting=>2, msg=>$self->l('Field is not filled').' «'.$self->l('Password').'»'}) if($field eq 'password' && $check eq 'required');
         push(@error, {sorting=>3, msg=>$self->l('Incorrect username or password')}) if($field eq 'login' && $check eq 'exist');
     }
