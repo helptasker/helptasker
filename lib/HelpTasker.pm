@@ -47,8 +47,8 @@ sub route {
     $r->get('/doc/')->to(controller => 'Doc', action=>'main');
     $r->get('/doc/:module')->to(controller => 'Doc', action=>'main');
 
-    $r->get('/auth/registration/')->to(controller => 'Auth', action=>'registration', handler=>'tx');
     $r->any(['GET', 'POST'] => '/auth/')->to(controller => 'Auth', action=>'login', handler=>'tx');
+    $r->any(['GET', 'POST'] => '/auth/registration/')->to(controller => 'Auth', action=>'registration', handler=>'tx');
     return $r;
 }
 
@@ -214,6 +214,7 @@ sub hooks {
 
     $self->hook(before_routes => sub {
         my $c = shift;
+		#$c->stash(param=>$c->req->params->to_hash);
 
         #my $ip = $c->req->headers->header('X-Real-IP') || $c->req->headers->header('X-Forwarded-For') || $c->tx->remote_address;
         #$self->app->log->info('Remote Address ' . $ip);
@@ -325,6 +326,18 @@ sub validation {
                 my $pg = $self->app->pg->db->query($sql,@bind);
                 my $rows = $pg->rows;
                 return defined $rows && $rows ? undef : 1;
+            }
+        }
+    );
+
+    $self->app->validator->add_check(
+        not_exist => sub {
+            my ($c, $field, $value, $args) = @_;
+            if(defined $field && $field eq 'login' && defined $value && $value){
+                my ($sql, @bind) = $self->api->utils->sql->select(-columns=>[qw/user_id/], -from=>'"user"', -where=>{login=>$value});
+                my $pg = $self->app->pg->db->query($sql,@bind);
+                my $rows = $pg->rows;
+                return defined $rows && $rows ? 1 : undef;
             }
         }
     );

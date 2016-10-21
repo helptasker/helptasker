@@ -59,4 +59,10 @@ ok($result->has_error('login') == 1, 'invalid login');
 $result = $t->app->validator->validation->input({ login=>'kazerogova' })->required('login')->exist('login');
 ok($result->has_error('login') != 1, 'valid login');
 
+$result = $t->app->validator->validation->input({ login=>'kazerogova' })->required('login')->not_exist('login');
+ok($result->has_error('login') == 1, 'exist login');
+
+$result = $t->app->validator->validation->input({ login=>'kazerogova_lilu' })->required('login')->not_exist('login');
+ok($result->has_error('login') != 1, 'not exist login');
+
 done_testing();

@@ -3,34 +3,38 @@
 : around content -> {
 <!-- BEGIN REGISTRATION FORM -->
 <form action="/auth/registration/" method="post">
+    <: $c.csrf_field | raw :>
     <h3 class="font-green"><: $c.l('Sign Up') :></h3>
+    : if $error {
+        <div class="alert alert-danger"><span><: $error | raw :></span></div>
+    : }
     <p class="hint"> <: $c.l('Enter your personal details below') :>: </p>
     <div class="form-group">
         <label class="control-label visible-ie8 visible-ie9"><: $c.l('Last Name') :></label>
-        <input class="form-control placeholder-no-fix" type="text" placeholder="<: $c.l('Last Name') :>" name="lastname" /> 
+        <input class="form-control placeholder-no-fix" type="text" placeholder="<: $c.l('Last Name') :>" name="lastname" value="<: $c.param('lastname') :>" /> 
     </div>
     <div class="form-group">
         <label class="control-label visible-ie8 visible-ie9"><: $c.l('First Name') :></label>
-        <input class="form-control placeholder-no-fix" type="text" placeholder="<: $c.l('First Name') :>" name="firstname" /> 
+        <input class="form-control placeholder-no-fix" type="text" placeholder="<: $c.l('First Name') :>" name="firstname" value="<: $c.param('firstname') :>" /> 
     </div>
     <div class="form-group">
         <label class="control-label visible-ie8 visible-ie9"><: $c.l('Email') :></label>
-        <input class="form-control placeholder-no-fix" type="email" placeholder="<: $c.l('Email') :>" name="email" /> 
+        <input class="form-control placeholder-no-fix" type="email" placeholder="<: $c.l('Email') :>" name="email" value="<: $c.param('email') :>" /> 
     </div>
 
     <p class="hint"> <: $c.l('Enter your account details below') :>: </p>
 
     <div class="form-group">
-        <label class="control-label visible-ie8 visible-ie9"><: $c.l('Username') :></label>
-        <input class="form-control placeholder-no-fix" type="text" autocomplete="off" placeholder="<: $c.l('Username') :>" name="username" /> 
+        <label class="control-label visible-ie8 visible-ie9"><: $c.l('Login') :></label>
+        <input class="form-control placeholder-no-fix" type="text" autocomplete="off" placeholder="<: $c.l('Login') :>" name="login" value="<: $c.param('login') :>" /> 
     </div>
     <div class="form-group">
         <label class="control-label visible-ie8 visible-ie9"><: $c.l('Password') :></label>
-        <input class="form-control placeholder-no-fix" type="password" autocomplete="off" placeholder="<: $c.l('Password') :>" name="password" /> 
+        <input class="form-control placeholder-no-fix" type="password" autocomplete="off" placeholder="<: $c.l('Password') :>" name="password" value="<: $c.param('password') :>" /> 
     </div>
     <div class="form-group">
         <label class="control-label visible-ie8 visible-ie9"><: $c.l('Re-type Your Password') :></label>
-        <input class="form-control placeholder-no-fix" type="password" autocomplete="off" placeholder="<: $c.l('Re-type Your Password') :>" name="rpassword" /> 
+        <input class="form-control placeholder-no-fix" type="password" autocomplete="off" placeholder="<: $c.l('Re-type Your Password') :>" name="re_password" value="<: $c.param('re_password') :>"/> 
     </div>
     <div class="form-actions">
         <a class="btn green btn-outline" href="/auth/" role="button"><: $c.l('Back') :></a>

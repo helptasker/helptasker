@@ -9,12 +9,12 @@
         <div class="alert alert-danger"><span><: $error | raw :></span></div>
     : }
     <div class="form-group">
-        <label class="control-label visible-ie8 visible-ie9"><: $c.l('Username') :></label>
-        <input class="form-control form-control-solid placeholder-no-fix" type="text" autocomplete="off" placeholder="<: $c.l('Username') :>" name="login" /> 
+        <label class="control-label visible-ie8 visible-ie9"><: $c.l('Login') :></label>
+        <input class="form-control form-control-solid placeholder-no-fix" type="text" autocomplete="off" placeholder="<: $c.l('Login') :>" name="login" value="<: $c.param('login') :>"/> 
     </div>
     <div class="form-group">
         <label class="control-label visible-ie8 visible-ie9"><: $c.l('Password') :></label>
-        <input class="form-control form-control-solid placeholder-no-fix" type="password" autocomplete="off" placeholder="<: $c.l('Password') :>" name="password" /> 
+        <input class="form-control form-control-solid placeholder-no-fix" type="password" autocomplete="off" placeholder="<: $c.l('Password') :>" name="password" value="<: $c.param('password') :>"/> 
     </div>
     <div class="form-actions">
         <button type="submit" class="btn green uppercase"><: $c.l('Log In') :></button>
