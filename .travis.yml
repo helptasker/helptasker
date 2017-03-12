@@ -18,7 +18,7 @@ services:
 addons:
   hosts:
     - helptasker.net
-  postgresql: "9.5"
+  postgresql: "9.6"
 env:
   - "MOJO_TEST=1"
 before_script:
