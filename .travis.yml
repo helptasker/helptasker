@@ -25,9 +25,8 @@ before_script:
   - psql -c 'create database travis_ci_test;' -U postgres
 notifications:
   email:
-    on_success: always
+    on_success: never
     on_failure: always
     recipients:
       - kostya@yandex.ru
 
-# https://github.com/travis-ci/apt-package-whitelist/blob/master/ubuntu-precise
