@@ -29,6 +29,9 @@ addons:
   postgresql: "9.4"
 env:
   - "MOJO_TEST=1"
+  global:
+    - secure:
+        - "txEcHdlQ5tJL8JTsUlvR3qyx4DgoRUfbveGwtUfXEf0nz/ifUrcPoyI1xkAwu2UguqXyCatPrJ5F3V7dr4lW3N8OPT0Wl7/ylIJ0GiMD3dMXqtpgsKZrcrteIviNyU8CDoM6sTNsJj9+Z67yCVv9E2zia3cR99+FkA/IEKk8LFfLBDSxw9VASX+5UaLQteljCKkJv14JJXX8s3AFKHq6K0W4HzEh9PbW468Pa8fh0oqlnEQ1I6kel8OPyJJQkSyRhc37D0K04zsNhfL8omdD17eV5PzjKeLp9GGSkQw1gxEXlf6LYKcKg/gmy3OnHDRg4TC0t2DIq7GMqvMcdQJCfNiIec7QkjyzreZbttPaR4+YJX6w333/FWS3JvhVp5Eob8Kx9/BzkNdClOsqwNfja9E+7l6y60XSWDyJpzNpSWYYzTwktyvlQ29WR3TIYIyYxz/qjWRH2YLLkKoAKTQJEClHhZSUmnBYhqaZ0Z3YiLC1gEnzprMsdXwRyVl4TZcQ57ZgblJEmHq3lZLzDx/B4vcJ5mNmpfEHGP2biAFFMgWFUiY+tPNW6CSGXCfozy7XI90cQ6fi5Vxd7pjfr7cOj/UFPkt3K5Roaocm/hAvB/CbOyT3VpVXSDj1XnbZs2UGHmU8kKg7VGTUifxBfystgcx2/Htn+OOl4OPIT0vQmEU="
 before_script:
   - psql -c 'create database travis_ci_test;' -U postgres
 notifications:
