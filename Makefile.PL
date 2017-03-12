@@ -37,6 +37,7 @@ WriteMakefile(
         'Text::Xslate' => '3.4.0',
         'SQL::Abstract::More' => '1.28',
         'Email::Valid' => '1.202',
+        'Net::Domain::TLD' => '1.75',
     },
     EXE_FILES => ['script/helptasker'],
     test=>{TESTS => 't/*.t t/*/*.t'}
