@@ -2,7 +2,6 @@ package HelpTasker::Lib::Utils;
 use Mojo::Base 'HelpTasker::Base';
 use Mojo::Util qw(dumper decode);
 use Carp qw(croak confess);
-use Data::Random qw(rand_chars);
 
 sub error_tx {
     my ($self, $tx) = @_;
