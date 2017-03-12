@@ -13,4 +13,3 @@ max_mccabe = 40
 max_elsif = 5
 
 [-Variables::ProhibitPackageVars]
-

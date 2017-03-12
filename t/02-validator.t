@@ -1,68 +1,69 @@
 use Mojo::Base -strict;
-use FindBin;
-use lib "$FindBin::Bin/../lib/";
+use Mojo::Util qw(dumper);
+use Mojo::JSON qw(true false);
 use Test::More;
 use Test::Mojo;
-use Mojo::Util qw(dumper);
-$ENV{'MOJO_TEST'} = 1;
+use FindBin;
+use Try::Tiny;
+use lib "$FindBin::Bin/../lib/";
+use HelpTasker::Command::migration;
 
 my $t = Test::Mojo->new('HelpTasker');
-$t->app->api->migration->clear;    # reset db
+my $migration = HelpTasker::Command::migration->new(app=>$t->app);
+$migration->run('-r','-v');
 
-ok(ref $t eq 'Test::Mojo', 'check object');
+note('filter');
+my $validation = $t->app->validator->validation->input({string=>' Kazerogova Lilu '});
+$validation->required('string','gap');
+ok($validation->param('string') eq 'KazerogovaLilu', 'filter gap');
 
-my $result = $t->app->validator->validation->input({email=>'test@@example.com'})->required('email')->email->is_valid('email');
-ok($result != 1, 'not valid email test@@example.com');
+$validation = $t->app->validator->validation->input({string=>' Kazerogova Lilu '});
+$validation->required('string','lc');
+ok($validation->param('string') eq ' kazerogova lilu ', 'filter lc');
 
-$result = $t->app->validator->validation->input({email=>'test@examplesssssssssssss.com'})->required('email')->email({mxcheck=>1})->is_valid('email');
-ok($result != 1, 'not valid email test@examplesssssssssssss.com (mxcheck=>1)');
+$validation = $t->app->validator->validation->input({string=>' Kazerogova Lilu '});
+$validation->required('string','trim');
+ok($validation->param('string') eq 'Kazerogova Lilu', 'filter trim');
 
-$result = $t->app->validator->validation->input({email=>'test@examplesssssssssssss.dddddd'})->required('email')->email({tldcheck=>1})->is_valid('email');
-ok($result != 1, 'not valid email test@examplesssssssssssss.dddddd (tldcheck=>1)');
+$validation = $t->app->validator->validation->input({phone=>'7 (909) 000-00-00'});
+$validation->required('phone','phone');
+ok($validation->param('phone') eq '79090000000', 'filter phone');
 
-$result = $t->app->validator->validation->input({email=>'test@example.com'})->required('email')->email->is_valid('email');
-ok($result == 1, 'valid email test@example.com');
+$validation = $t->app->validator->validation->input({phone=>'+7 (909) 000-00-00'});
+$validation->required('phone','phone');
+ok($validation->param('phone') eq '79090000000', 'filter phone 2');
 
-$result = $t->app->validator->validation->input({ref=>{test=>1}})->required('ref')->ref('HASH')->is_valid('ref');
-ok($result == 1, 'valid ref HASH');
+note('check');
+$validation = $t->app->validator->validation->input({email=>'Devnull@example.com'});
+$validation->required('email')->email;
+ok($validation->param('email') eq 'Devnull@example.com', 'check email');
 
-$result = $t->app->validator->validation->input({ ref=>[{test=>1}] })->required('ref')->ref('HASH')->is_valid('ref');
-ok($result == 1, 'valid ref HASH in Array');
+$validation = $t->app->validator->validation->input({email=>'devnull@example.ssssssssssssssssssssssssss'});
+$validation->required('email')->email({mxcheck=>1, tldcheck=>1});
+ok($validation->has_error('email') == 1, 'invalid email devnull@example.ssssssssssssssssssssssssss');
 
-$result = $t->app->validator->validation->input({ ref=>$t })->required('ref')->ref('Test::Mojo')->is_valid('ref');
-ok($result == 1, 'valid ref Test::Mojo');
+$validation = $t->app->validator->validation->input({email=>'devnullexample.com'});
+$validation->required('email')->email();
+ok($validation->has_error('email') == 1, 'invalid email devnullexample.com');
 
-$result = $t->app->validator->validation->input({ string=>' hello ' })->required('string','gap');
-ok($result->param('string') eq 'hello', 'check filter gap');
+$validation = $t->app->validator->validation->input({phone=>'+7 (909) 000-00-00'});
+$validation->required('phone','phone')->phone({type=>'mobile'});
+ok($validation->param('phone') eq '79090000000', 'phone mobile');
 
-$result = $t->app->validator->validation->input({ string=>' hel lo ' })->required('string','gap');
-ok($result->param('string') eq 'hello', 'check filter gap (2)');
+$validation = $t->app->validator->validation->input({phone=>'+7 (495) 000-00-00'});
+$validation->required('phone','phone')->phone({type=>'mobile'});
+ok($validation->has_error('phone') == 1, 'invalid phone mobile');
 
-$result = $t->app->validator->validation->input({ string=>' При вет ' })->required('string','gap');
-ok($result->param('string') eq 'Привет', 'check filter gap (3)');
+$validation = $t->app->validator->validation->input({phone=>'+7 (495) 000-00-00'});
+$validation->required('phone','phone')->phone();
+ok($validation->param('phone') eq '74950000000', 'phone mobile2');
 
-$result = $t->app->validator->validation->input({ string=>'HELLO' })->required('string','lc');
-ok($result->param('string') eq 'hello', 'check filter lc');
-
-$result = $t->app->validator->validation->input({ string=>'ПРИВЕТ' })->required('string','lc');
-ok($result->param('string') eq 'привет', 'check filter lc (2)');
-
-$result = $t->app->validator->validation->input({ login=>'kostya.ten' })->required('login','oauth_login');
-ok($result->param('login') eq 'kostyaten', 'check filter login');
-
-note('Validator check exist');
-$result = $t->app->api->user->create('kazerogova', {firstname=>'Kazerogova', lastname=>'Lilu', email=>'kazergova@example.com'});
-
-$result = $t->app->validator->validation->input({ login=>'kostya.ten' })->required('login')->exist('login');
-ok($result->has_error('login') == 1, 'invalid login');
-
-$result = $t->app->validator->validation->input({ login=>'kazerogova' })->required('login')->exist('login');
-ok($result->has_error('login') != 1, 'valid login');
-
-$result = $t->app->validator->validation->input({ login=>'kazerogova' })->required('login')->not_exist('login');
-ok($result->has_error('login') == 1, 'exist login');
-
-$result = $t->app->validator->validation->input({ login=>'kazerogova_lilu' })->required('login')->not_exist('login');
-ok($result->has_error('login') != 1, 'not exist login');
+$t->app->lib->users->create(login=>'kazerogova', firstname=>'Lilu', lastname=>'Kazerogova', email=>'devnull@yandex.ru', password=>'1234567890');
+try {
+    $t->app->lib->users->create(login=>'kazerogova', firstname=>'Lilu', lastname=>'Kazerogova', email=>'devnull@yandex.ru', password=>'1234567890');
+}
+catch {
+    like($_, qr/^invalid param field:login, check:check_login/, 'user already exists');
+};
 
 done_testing();

@@ -17,3 +17,4 @@ push(@dir_watch, "$FindBin::Bin/../$_/") for(qw/lib templates public/);
 my $morbo = Mojo::Server::Morbo->new;
 $morbo->watch(\@dir_watch);
 $morbo->run($FindBin::Bin.'/helptasker');
+
