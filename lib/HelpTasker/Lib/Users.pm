@@ -54,11 +54,7 @@ sub gets {
 
 sub get {
     my ($self,%param) = @_;
-    $self->validation->input(\%param);
-    $self->validation->required('user_id','gap')->like(qr/^[0-9]+$/x)->id;
-    $self->lib->utils->validation_error($self->validation);
-
-    my $gets = $self->gets(user_id=>$self->validation->param('user_id'));
+    my $gets = $self->gets(%param);
     return shift @{$gets} if(@{$gets});
     return;
 }

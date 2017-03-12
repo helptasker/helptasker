@@ -45,7 +45,7 @@ sub save {
             email=>$self->email,
             password=>$self->password,
             is_active=>$self->is_active,
-            date_update=>\'current_timestamp'
+            date_update=>\'current_timestamp',
         },
         -where => {user_id=>$self->user_id},
     );

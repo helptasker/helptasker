@@ -46,18 +46,18 @@ ok($t->app->lib->utils->declination_by_numbers(1,'Яблоко','Яблока','
 ok($t->app->lib->utils->declination_by_numbers(22,'Яблоко','Яблока','Яблок') eq 'Яблока', 'form 2');
 ok($t->app->lib->utils->declination_by_numbers(30,'Яблоко','Яблока','Яблок') eq 'Яблок', 'form 3');
 
-note('random');
-my $random = $t->app->lib->utils->random('alpha',40);
-like($random, qr/[a-zA-Z]{40}/, 'alpha');
+#note('random');
+#my $random = $t->app->lib->utils->random('alpha',40);
+#like($random, qr/[a-zA-Z]{40}/, 'alpha');
 
-$random = $t->app->lib->utils->random('upperalpha',20);
-like($random, qr/[A-Z]{20}/, 'upperalpha');
+#$random = $t->app->lib->utils->random('upperalpha',20);
+#like($random, qr/[A-Z]{20}/, 'upperalpha');
 
-$random = $t->app->lib->utils->random('loweralpha',20);
-like($random, qr/[a-z]{20}/, 'loweralpha');
+#$random = $t->app->lib->utils->random('loweralpha',20);
+#like($random, qr/[a-z]{20}/, 'loweralpha');
 
-$random = $t->app->lib->utils->random('numeric',10);
-like($random, qr/[0-9]{10}/, 'numeric');
+#$random = $t->app->lib->utils->random('numeric',10);
+#like($random, qr/[0-9]{10}/, 'numeric');
 
 
 done_testing();

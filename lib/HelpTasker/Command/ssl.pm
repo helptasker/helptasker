@@ -15,6 +15,8 @@ has usage => sub { shift->extract_usage };
  
 sub run {
     my ($self, $host) = @_;
+    croak qq/invalid host/ if(!defined $host);
+
     $host = "https://".$host if($host !~ m/^http/x);
     my $url = Mojo::URL->new($host);
 
@@ -43,6 +45,7 @@ HelpTasker::Command::ssl - SSL check command certificate
   Usage: APPLICATION ssl [HOST]
  
     helptasker ssl https://google.com
+    helptasker ssl google.com
  
   Options:
     -h, --help      Show this summary of available options

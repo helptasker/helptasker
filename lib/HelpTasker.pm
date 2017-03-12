@@ -39,6 +39,7 @@ sub _config {
         secrets=>['My very secret passphrase.'],
         postgresql=>'postgresql://test:test@localhost/test',
         sentry=>'https://29b098384d3742c29b245be361353e3d:afdc2d31a9f74ffd8d1e4c202793fc04@sentry.io/143468',
+        session_default_expiration=>600,
     };
     $self->plugin('Config', {default => $config});
     return $self;
@@ -147,9 +148,10 @@ sub _lib {
             my $log        = $self->log;
             my $validation = $self->validation;
             my $ua         = $self->ua;
-            my $config     = $self->config;
+            my $defaults   = $self->defaults;
             my $sql        = SQL::Abstract::More->new();
-            $self->helper('lib.'.$l => sub { $module->new(pg=>$pg, log=>$log, validation=>$validation, ua=>$ua, config=>$config, sql=>$sql, lib=>$self->lib) });
+
+            $self->helper('lib.'.$l => sub { $module->new(pg=>$pg, log=>$log, validation=>$validation, ua=>$ua, defaults=>$defaults, sql=>$sql, lib=>$self->lib) });
         }
     }
     return $self;
@@ -158,24 +160,25 @@ sub _lib {
 sub _hooks {
     my $self = shift;
 
-    $self->hook(around_dispatch => sub {
-        my ($next, $c) = @_;
-        try {
-            $next->();
-        }
-        catch {
-            say $_;
-            say '111111111111111';
-            #$c->__sentry($c,$_);
-        };
-        $next->();
-    });
-
+    #$self->hook(around_dispatch => sub {
+    #    my ($next, $c) = @_;
+    #    try {
+    #        $next->();
+    #    }
+    #    catch {
+    #        #say $_;
+    #        #say '111111111111111';
+    #        #$c->__sentry($c,$_);
+    #    };
+    #    $next->();
+    #});
+    return;
 }
 
-sub __sentry {
+#sub __sentry {
     #my ($self, $c, $message) = @_;
-}
+#    return;
+#}
 
 1;
 

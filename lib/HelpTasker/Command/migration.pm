@@ -99,7 +99,7 @@ CREATE TABLE sessions (
     session_key  TEXT      NULL,
     name         TEXT      NOT NULL,
     user_id      INTEGER   NULL,
-    expire       INTEGER   NOT NULL,
+    expiration   INTEGER   NOT NULL,
     ip           INET      NULL,
     data         JSON      NOT NULL
 );
