@@ -36,6 +36,7 @@ WriteMakefile(
         'Number::Phone'=>'3.3000',
         'Text::Xslate' => '3.4.0',
         'SQL::Abstract::More' => '1.28',
+        'Email::Valid' => '1.202',
     },
     EXE_FILES => ['script/helptasker'],
     test=>{TESTS => 't/*.t t/*/*.t'}
