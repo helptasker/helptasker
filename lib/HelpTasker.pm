@@ -38,11 +38,17 @@ sub _config {
     my $config = {
         secrets=>['My very secret passphrase.'],
         postgresql=>'postgresql://test:test@localhost/test',
-        sentry=>'https://29b098384d3742c29b245be361353e3d:afdc2d31a9f74ffd8d1e4c202793fc04@sentry.io/143468',
         session_default_expiration=>600,
     };
-    $self->plugin('Config', {default => $config});
-    return $self;
+
+    if (defined $ENV{'TRAVIS'}) {
+        $config = $self->plugin('Config', {default => $config});
+        $config->{'pg'} = 'postgresql://postgres@localhost/travis_ci_test';
+        return $config;
+    }
+    else{
+        return $self->plugin('Config', {default => $config});
+    }
 }
 
 # Namespaces
