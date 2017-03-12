@@ -5,6 +5,7 @@ use Mojo::Util qw(dumper);
 has ['pg','log','validation','ua','defaults','lib','model','sql'];
 
 sub config {
-    return $_[0]->defaults->{'config'}->{$_[1]};
+    my ($self,$name) = @_;
+    return $self->defaults->{'config'}->{$name};
 }
 1;
