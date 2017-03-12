@@ -1,0 +1,44 @@
+sudo: true
+language: perl
+cache: bundler
+perl:
+  - "5.24"
+  - "5.22"
+  - "5.20"
+  - "5.18"
+  - "5.16"
+  - "5.14"
+install:
+  - "cpanm -n Mojolicious DBI Mojo::Pg EV IO::Socket::Socks IO::Socket::SSL Net::DNS::Native Test::Perl::Critic Test::Pod Test::Pod::Coverage"
+  - "cpanm --quiet --installdeps --notest ."
+services:
+  - memcached
+  - elasticsearch
+  - postgresql
+  - redis-server
+addons:
+  apt:
+    packages:
+    - libxml2-dev
+    - libexpat1-dev
+    - libv8-3.14-dev
+    - libgd-dev
+addons:
+  hosts:
+    - helptasker.net
+  postgresql: "9.4"
+env:
+  - "MOJO_TEST=1"
+before_install:
+  - curl -O https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/deb/elasticsearch/2.3.4/elasticsearch-2.3.4.deb && sudo dpkg -i --force-confnew elasticsearch-2.3.4.deb && sudo service elasticsearch restart
+before_script:
+  - mysql --version
+  - psql -c 'create database travis_ci_test;' -U postgres
+notifications:
+  email:
+    on_success: always
+    on_failure: always
+    recipients:
+      - kostya@yandex.ru
+
+# https://github.com/travis-ci/apt-package-whitelist/blob/master/ubuntu-precise
