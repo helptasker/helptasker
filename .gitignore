@@ -23,4 +23,5 @@ helptasker.production.conf
 account.key
 helptasker.crt
 helptasker.key
+helptasker.conf
 log
