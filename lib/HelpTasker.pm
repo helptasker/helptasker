@@ -41,9 +41,9 @@ sub _config {
         session_default_expiration=>600,
     };
 
-    if (defined $ENV{'TRAVIS'}) {
+    if (defined $ENV{'TRAVIS'} && $ENV{'TRAVIS'} == 1) {
+        $config->{'postgresql'} = 'postgresql://postgres@localhost/travis_ci_test';
         $config = $self->plugin('Config', {default => $config});
-        $config->{'pg'} = 'postgresql://postgres@localhost/travis_ci_test';
         return $config;
     }
     else{
