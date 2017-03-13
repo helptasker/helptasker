@@ -41,11 +41,11 @@ sub gets {
     $self->lib->utils->validation_error($self->validation);
 
     my $where = {};
-    if(my $session_id = $self->validation->param('session_id')){
-        $where->{'session_id'} = $session_id;
+    if(my $session_id = $self->validation->every_param('session_id')){
+        $where->{'session_id'} = {-in=>$session_id};
     }
-    elsif(my $session_key = $self->validation->param('session_key')){
-        $where->{'session_key'} = $session_key;
+    elsif(my $session_key = $self->validation->every_param('session_key')){
+        $where->{'session_key'} = {-in=>$session_key};
     }
     else{
         croak qq/invalid param session_id or session_key/;
@@ -61,11 +61,11 @@ sub gets {
     my $pg = $self->pg->db->query($sql,@bind);
 
     my @result = ();
-    while (my $next = $pg->hash) {
+    while (my $next = $pg->expand->hash) {
         $next->{'date_create'} = Mojo::Date->new($next->{'date_create'});
         $next->{'date_update'} = Mojo::Date->new($next->{'date_update'});
         $next->{'date_expire'} = Mojo::Date->new($next->{'date_expire'});
-        push(@result, HelpTasker::Lib::Session::Session->new(%{$next}));
+        push(@result, HelpTasker::Lib::Session::Session->new(%{$next}, pg=>$self->pg, log=>$self->log, sql=>$self->sql));
     }
     return \@result;
 }

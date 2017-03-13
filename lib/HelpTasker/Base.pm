@@ -8,4 +8,5 @@ sub config {
     my ($self,$name) = @_;
     return $self->defaults->{'config'}->{$name};
 }
+
 1;

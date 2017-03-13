@@ -4,7 +4,7 @@ use Mojo::Util qw(dumper);
 use Mojo::JSON qw(true false);
 
 has [qw/pg sql log/];
-has [qw/age session_id date_create date_expire date_update expiration ip name session_id session_key user_id/];
+has [qw/user_id age session_id date_create date_expire date_update expiration ip name session_id session_key/];
 
 sub to_hash {
     my $self = shift;
