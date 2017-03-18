@@ -27,7 +27,7 @@ ok($get->to_hash->{'name'} eq '_default', 'ok name');
 like($get->to_hash->{'session_id'}, qr/^[0-9]+$/, 'ok session_id');
 like($get->to_hash->{'session_key'}, qr/^[0-9]+\.[0-9a-z]{40}$/i, 'ok session_key');
 
-my $user = $t->app->lib->users->create(login=>'KAZEROGOVA', firstname=>'Lilu', lastname=>'Kazerogova', email=>'devnull@yandex.ru', password=>'1234567890');
+my $user = $t->app->lib->users->create(login=>'KAZEROGOVA', firstname=>'Lilu', lastname=>'Казерогова', email=>'devnull@yandex.ru', password=>'1234567890');
 
 $get = $t->app->lib->sessions->create(
     name=>'test_session',
@@ -42,6 +42,5 @@ $get = $t->app->lib->sessions->create(
 );
 
 
-say dumper $get->to_hash;
-
+#say dumper $get->to_hash; GeoIPv6.dat
 done_testing();

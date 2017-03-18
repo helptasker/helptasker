@@ -13,6 +13,7 @@ sub create {
     $self->validation->optional('ip');
     $self->validation->optional('user_id','gap')->like(qr/^[0-9]+$/x)->id;
     $self->validation->optional('user')->ref('HelpTasker::Lib::User::User');
+    $self->validation->optional('data');
     $self->lib->utils->validation_error($self->validation);
 
     $self->validation->output->{'name'}        ||= '_default';
