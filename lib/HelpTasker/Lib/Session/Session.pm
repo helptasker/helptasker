@@ -11,7 +11,12 @@ sub to_hash {
     my $return = {};
     while( my ($key) = each(%{$self})){
         next if($key eq 'pg' or $key eq 'log' or $key eq 'sql');
-        $return->{$key} = $self->{$key};
+        if($key eq 'user'){
+            $return->{$key} = $self->{$key}->to_hash;
+        }
+        else{
+            $return->{$key} = $self->{$key};
+        }
     }
     return $return;
 }

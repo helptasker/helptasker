@@ -104,6 +104,12 @@ sub _validator {
         return Email::Valid->address(-address => $value, -mxcheck=>$mxcheck, -tldcheck=>$tldcheck) ? false : true;    
     });
 
+    $self->validator->add_check(ref=>sub {
+        my ($validation, $field, $value, $args) = @_;
+        return 0 if(defined $args && $args eq ref $value);
+        return 1;
+    });
+
     $self->validator->add_check(phone => sub {
         my ($validation, $field, $value, $args) = @_;
         $value .= "+" if($value !~ /^\+/x);
@@ -152,12 +158,13 @@ sub _lib {
 
             my $pg         = $self->pg;
             my $log        = $self->log;
-            my $validation = $self->validation;
             my $ua         = $self->ua;
             my $defaults   = $self->defaults;
-            my $sql        = SQL::Abstract::More->new();
-
-            $self->helper('lib.'.$l => sub { $module->new(pg=>$pg, log=>$log, validation=>$validation, ua=>$ua, defaults=>$defaults, sql=>$sql, lib=>$self->lib) });
+            $self->helper('lib.'.$l => sub {
+                my $c = shift;
+                #$module->new(app=>$self->app);
+                $module->new(lib=>$c->lib, pg=>$c->app->pg, log=>$c->app->log, defaults=>$c->app->defaults, validation=>$c->app->validation, ua=>$c->app->ua);
+            });
         }
     }
     return $self;

@@ -33,5 +33,10 @@ subtest 'sub test User.pm' => sub {
     ok($user->password eq '01b307acba4f54f55aafc33bb06bbbf6ca803e9a', 'password');
 };
 
+subtest 'sub test User.pm save' => sub {
+    $user->firstname('Seraya');
+    $user->save;
+    ok($user->firstname eq 'Seraya', 'update check');
+};
 
 done_testing();

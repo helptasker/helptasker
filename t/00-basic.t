@@ -12,6 +12,8 @@ my $t = Test::Mojo->new('HelpTasker');
 my $migration = HelpTasker::Command::migration->new(app=>$t->app);
 $migration->run('-r','-v');
 
+$t->app->lib->users;
+
 #my $user = $t->app->lib->users->create(login=>'kostyaten', firstname=>'Kostya', lastname=>'Ten');
 
 #say $t->app->libs->users->create(login=>'kostya.ten');

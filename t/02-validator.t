@@ -66,4 +66,13 @@ catch {
     like($_, qr/^invalid param field:login, check:check_login/, 'user already exists');
 };
 
+$validation = $t->app->validator->validation->input({object=>bless(my $res = {},'Testing::Module')});
+$validation->required('object')->ref('Testing::Module');
+ok(ref $validation->param('object') eq 'Testing::Module', 'object Testing::Module');
+
+$validation = $t->app->validator->validation->input({object=>bless(my $res2 = {},'Testing::Module')});
+$validation->required('object')->ref('Testing::Module::Error');
+ok(ref $validation->param('object') ne 'Testing::Module', 'invalid object Testing::Module');
+
+
 done_testing();

@@ -24,6 +24,7 @@ sub create {
         -values    => $self->validation->output,
         -returning => 'user_id',
     );
+
     my $user_id = $self->pg->db->query($sql,@bind)->hash->{'user_id'};
     return $self->get(user_id=>$user_id);
 }

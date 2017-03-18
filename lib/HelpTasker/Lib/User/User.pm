@@ -49,7 +49,19 @@ sub save {
         },
         -where => {user_id=>$self->user_id},
     );
-    $self->pg->db->query($sql,@bind);
+    my $pg = $self->pg->db->query($sql,@bind);
+    if($pg->rows == 1){
+        my @log = ();
+        push(@log, 'user_id:'.$self->user_id || 'n/a');
+        push(@log, 'login:'.$self->login || 'n/a');
+        push(@log, 'lastname:'.$self->lastname || 'n/a');
+        push(@log, 'firstname:'.$self->firstname || 'n/a');
+        push(@log, 'email:'.$self->email || 'n/a');
+        push(@log, 'password:'.$self->password || 'n/a');
+        push(@log, 'is_active:'.$self->is_active || 'n/a');
+        $self->log->info('update user '.join(", ",@log));
+    }
+
     return $self;
 }
 

@@ -16,7 +16,6 @@ $migration->run('-r','-v');
 note('null session');
 $t->app->lib->sessions->create();
 my $get = $t->app->lib->sessions->get(session_id=>1);
-
 ok($get->valid == 1, 'ok method valid');
 ok($get->to_hash->{'age'} > 0, 'ok age');
 ok(ref $get->to_hash->{'data'} eq 'HASH', 'ok data');
@@ -28,5 +27,21 @@ ok($get->to_hash->{'name'} eq '_default', 'ok name');
 like($get->to_hash->{'session_id'}, qr/^[0-9]+$/, 'ok session_id');
 like($get->to_hash->{'session_key'}, qr/^[0-9]+\.[0-9a-z]{40}$/i, 'ok session_key');
 
+my $user = $t->app->lib->users->create(login=>'KAZEROGOVA', firstname=>'Lilu', lastname=>'Kazerogova', email=>'devnull@yandex.ru', password=>'1234567890');
+
+$get = $t->app->lib->sessions->create(
+    name=>'test_session',
+    user=>$user,
+    data=>{
+        string_en=>'string',
+        string_ru=>'строка',
+        int=>12345,
+        bool_true=>true,
+        bool_false=>false,
+    }
+);
+
+
+say dumper $get->to_hash;
 
 done_testing();

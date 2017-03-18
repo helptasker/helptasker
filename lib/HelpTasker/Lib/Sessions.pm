@@ -12,12 +12,19 @@ sub create {
     $self->validation->optional('expiration')->like(qr/^[0-9]+$/x);
     $self->validation->optional('ip');
     $self->validation->optional('user_id','gap')->like(qr/^[0-9]+$/x)->id;
+    $self->validation->optional('user')->ref('HelpTasker::Lib::User::User');
+    $self->lib->utils->validation_error($self->validation);
 
     $self->validation->output->{'name'}        ||= '_default';
     $self->validation->output->{'expiration'}  ||= $self->validation->param('expiration') || $self->config('session_default_expiration') || 600;
 
     $self->validation->output->{'data'}        = [ "?::json", {json => $self->validation->param('data') || {} } ];
     $self->validation->output->{'date_expire'} = Mojo::Date->new(time+$self->validation->output->{'expiration'} );
+
+    if(my $user = $self->validation->param('user')){
+        delete $self->validation->output->{'user'};
+        $self->validation->output->{'user_id'} = $user->user_id;
+    }
 
     my ($sql, @bind) = $self->sql->insert(-into=>'sessions', -values=>$self->validation->output, -returning => 'session_id');
     my $session_id = $self->pg->db->query($sql,@bind)->hash->{'session_id'};
@@ -30,7 +37,7 @@ sub create {
     ($sql, @bind) = $self->sql->update(-table=>'sessions', -set=>{session_key => $session_key}, -where=>{session_id => $session_id});
     $self->pg->db->query($sql,@bind);
 
-    return $self->get(session_id=>$session_id);
+    return $self->lib->sessions->get(session_id=>$session_id);
 }
 
 sub gets {
@@ -60,12 +67,23 @@ sub gets {
     );
     my $pg = $self->pg->db->query($sql,@bind);
 
+    my @user_id = ();
     my @result = ();
     while (my $next = $pg->expand->hash) {
+        push(@user_id,$next->{'user_id'}) if(defined $next->{'user_id'});
         $next->{'date_create'} = Mojo::Date->new($next->{'date_create'});
         $next->{'date_update'} = Mojo::Date->new($next->{'date_update'});
         $next->{'date_expire'} = Mojo::Date->new($next->{'date_expire'});
         push(@result, HelpTasker::Lib::Session::Session->new(%{$next}, pg=>$self->pg, log=>$self->log, sql=>$self->sql));
+    }
+
+    if(@user_id){
+        my $users = $self->lib->users->gets(user_id=>\@user_id);
+        for my $item (@result){
+            if(my @res = grep { $_->user_id == $item->{'user_id'} } @{$users}){
+                $item->{'user'} = shift @res;
+            }
+        }
     }
     return \@result;
 }
