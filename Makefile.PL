@@ -38,6 +38,7 @@ WriteMakefile(
         'SQL::Abstract::More' => '1.28',
         'Email::Valid' => '1.202',
         'Net::Domain::TLD' => '1.75',
+        'Cache::Memcached::Fast'=>'0.25',
     },
     EXE_FILES => ['script/helptasker'],
     test=>{TESTS => 't/*.t t/*/*.t'}

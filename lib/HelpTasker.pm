@@ -36,8 +36,10 @@ sub startup {
 sub _config {
     my $self = shift;
     my $config = {
-        secrets=>['My very secret passphrase.'],
+        secrets=>['My very secret passphrase'],
         postgresql=>'postgresql://test:test@localhost/test',
+        cache_module=>'HelpTasker::Lib::Cache::Memcached',
+        cache_memcached_host=>'memcached://localhost:11211/helptasker',
         session_default_expiration=>600,
     };
 
@@ -155,18 +157,24 @@ sub _lib {
         carp qq{Loading "$module" failed: $e} and next if ref $e;
         if ($module =~ m/\:\:(?<module>[a-z0-9]+)$/ix) {
             my $l = lc($+{'module'});
-
-            my $pg         = $self->pg;
-            my $log        = $self->log;
-            my $ua         = $self->ua;
-            my $defaults   = $self->defaults;
             $self->helper('lib.'.$l => sub {
                 my $c = shift;
-                #$module->new(app=>$self->app);
                 $module->new(lib=>$c->lib, pg=>$c->app->pg, log=>$c->app->log, defaults=>$c->app->defaults, validation=>$c->app->validation, ua=>$c->app->ua);
             });
         }
     }
+
+    # Cache module
+	my $module = $self->config('cache_module');
+	if(my $e = load_class $module){
+		carp ref $e ? "Exception: $e" : 'Not found module!';
+	}
+
+    $self->helper('lib.cache' => sub {
+        my $c = shift;
+    	$module->new(lib=>$c->lib, log=>$c->app->log, defaults=>$c->app->defaults, validation=>$c->app->validation);
+    });
+
     return $self;
 }
 

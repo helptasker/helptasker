@@ -27,4 +27,15 @@ sub valid {
     return false;
 }
 
+sub remove {
+    my $self = shift;
+
+    my ($sql, @bind) = $self->sql->delete(-from=>'sessions', -where=>{session_id=>$self->session_id});
+    my $pg = $self->pg->db->query($sql,@bind);
+    if($pg->rows == 1){
+        $self->log->info('delete session_id:'.$self->session_id);
+    }
+    return;
+}
+
 1;

@@ -41,6 +41,6 @@ $get = $t->app->lib->sessions->create(
     }
 );
 
+say dumper $get->remove;
 
-#say dumper $get->to_hash; GeoIPv6.dat
 done_testing();

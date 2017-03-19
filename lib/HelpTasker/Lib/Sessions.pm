@@ -38,7 +38,7 @@ sub create {
     ($sql, @bind) = $self->sql->update(-table=>'sessions', -set=>{session_key => $session_key}, -where=>{session_id => $session_id});
     $self->pg->db->query($sql,@bind);
 
-    return $self->lib->sessions->get(session_id=>$session_id);
+    return $self->get(session_id=>$session_id);
 }
 
 sub gets {
@@ -71,7 +71,7 @@ sub gets {
     my @user_id = ();
     my @result = ();
     while (my $next = $pg->expand->hash) {
-        push(@user_id,$next->{'user_id'}) if(defined $next->{'user_id'});
+        push(@user_id,$next->{'user_id'}) if(defined $next->{'user_id'} && $next->{'user_id'} =~ m/^[0-9]+$/x);
         $next->{'date_create'} = Mojo::Date->new($next->{'date_create'});
         $next->{'date_update'} = Mojo::Date->new($next->{'date_update'});
         $next->{'date_expire'} = Mojo::Date->new($next->{'date_expire'});
