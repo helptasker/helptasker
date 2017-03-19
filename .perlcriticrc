@@ -12,4 +12,9 @@ max_mccabe = 40
 [ControlStructures::ProhibitCascadingIfElse]
 max_elsif = 5
 
+[-NamingConventions::ProhibitAmbiguousNames]
+forbid = set
+
 [-Variables::ProhibitPackageVars]
+
+
